@@ -31,7 +31,7 @@ const CodeEditor = ({ initialCode, language, problemSlug }) => {
       <div className="bg-gray-800 p-4 flex justify-between items-center">
         <span className="text-white" >JavaScript  &nbsp;&nbsp;&nbsp;</span>
         <button
-          onClick={handleRunCode}
+          onClick={handleRunCode} 
           disabled={isLoading}
           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded disabled:bg-gray-400"
         >
