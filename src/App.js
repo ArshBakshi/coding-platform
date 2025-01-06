@@ -1,8 +1,9 @@
-import React from 'react';
-import MainPage from './pages/MainPage';
-import './App.css';
+import React from "react";
+import MainPage from "./pages/MainPage";
+import "./App.css";
 
 function App() {
+  //hiiii
   return (
     <div className="App">
       <header className="App-header">
