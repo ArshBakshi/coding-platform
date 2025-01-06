@@ -6,31 +6,33 @@ import { getApiData } from "./api/getApiData";
 import { Aptitude } from "./pages/Aptitude";
 import { Maths } from "./pages/Maths";
 import { Logical } from "./pages/Logical";
-import Home from "./pages/Home";
+import { AppLayout } from "./layout/AppLayout";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Home />,
+      element: <AppLayout />,
+      children: [
+        {
+          path: "/logical",
+          element: <Logical />,
+        },
+        {
+          path: "/maths",
+          element: <Maths />,
+        },
+        {
+          path: "/aptitude",
+          element: <Aptitude />,
+          loader: getApiData,
+        },
+        {
+          path: "/coding",
+          element: <MainPage />,
+        },
+      ],
     },
-    {
-      path: "/logical",
-      element: <Logical />,
-    },
-    {
-      path: "/maths",
-      element: <Maths />,
-    },
-    {
-      path: "/aptitude",
-      element: <Aptitude />,
-      loader:getApiData,
-    },
-    {
-      path: "/coding",
-      element:<MainPage />
-    }
   ]);
   return <RouterProvider router={router} />;
 }

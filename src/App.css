@@ -40,9 +40,15 @@
   background-color: #e9ecef;
 }
 
-.difficulty-1 { color: #00b8a3; }
-.difficulty-2 { color: #ffc01e; }
-.difficulty-3 { color: #ff375f; }
+.difficulty-1 {
+  color: #00b8a3;
+}
+.difficulty-2 {
+  color: #ffc01e;
+}
+.difficulty-3 {
+  color: #ff375f;
+}
 
 .problem-description {
   text-align: left;
@@ -52,4 +58,59 @@
 .code-editor {
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+/* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Navbar styles */
+.navbar {
+  background-color: #333;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navbar-list {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+}
+
+.navbar-link {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.navbar-link:hover {
+  text-decoration: underline;
+}
+
+.active-link {
+  color: yellow; /* You can change the color for active link */
+}
+
+/* Home Page styles */
+.home-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  text-align: center;
+}
+
+.home-page h1 {
+  font-size: 36px;
+  color: #333;
 }
