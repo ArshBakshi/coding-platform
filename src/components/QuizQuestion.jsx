@@ -3,61 +3,88 @@ import React, { useState } from 'react';
 const QuizQuestion = ({ questionData }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [answered, setAnswered] = useState(false);
+  const [score, setScore] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
 
-  // Handle answer selection
   const handleAnswerSelection = (answerKey) => {
     if (!answered) {
       setSelectedAnswer(answerKey);
     }
   };
 
-  // Check if the answer is correct
   const checkAnswer = (answerKey) => {
     return questionData.correct_answers[`answer_${answerKey}_correct`] === "true";
   };
 
-  // Get the appropriate class for the answer based on whether it's correct or incorrect
+  const handleShowAnswer = () => {
+    if (selectedAnswer && !answered) {
+      setAnswered(true);
+      setTotalAttempts(totalAttempts + 1);
+      if (checkAnswer(selectedAnswer)) {
+        setScore(score + 1);
+      }
+    }
+  };
+
   const getAnswerClass = (answerKey) => {
-    if (answered) {
-      return checkAnswer(answerKey) ? 'correct' : 'incorrect';
+    if (!answered) return '';
+    if (checkAnswer(answerKey)) return 'bg-green-100 border-green-500';
+    if (answerKey === selectedAnswer && !checkAnswer(answerKey)) {
+      return 'bg-red-100 border-red-500';
     }
     return '';
   };
 
-  // Display the correct answer and explanation when the solution button is clicked
-  const handleShowAnswer = () => {
-    setAnswered(true);
-  };
-
   return (
-    <div className="quiz-container">
-      <h2>Question: {questionData.question}</h2>
-      <p><strong>Description:</strong> {questionData.description}</p>
-      <p><strong>Difficulty:</strong> {questionData.difficulty}</p>
-      <p><strong>Category:</strong> {questionData.category}</p>
-      
-      {/* Display answer options */}
-      <div className="answer-options">
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-4">{questionData.question}</h2>
+        <p className="text-gray-700 mb-2">{questionData.description}</p>
+        <div className="flex gap-4 text-sm text-gray-600">
+          <span className="bg-blue-100 px-2 py-1 rounded">{questionData.difficulty}</span>
+          <span className="bg-purple-100 px-2 py-1 rounded">{questionData.category}</span>
+        </div>
+      </div>
+
+      <div className="space-y-3">
         {Object.keys(questionData.answers)
-          .filter(key => questionData.answers[key])  // Filter out null answers
+          .filter(key => questionData.answers[key])
           .map((answerKey, index) => (
-            <div 
+            <div
               key={index}
-              className={`answer-option ${getAnswerClass(answerKey)}`} 
-              onClick={() => handleAnswerSelection(answerKey.substring(7))} // Remove "answer_" part
+              onClick={() => handleAnswerSelection(answerKey.substring(7))}
+              className={`p-4 border-2 rounded-lg cursor-pointer transition-colors
+                ${!answered && !selectedAnswer ? 'hover:bg-gray-50' : ''}
+                ${selectedAnswer === answerKey.substring(7) ? 'border-blue-500' : 'border-gray-200'}
+                ${getAnswerClass(answerKey.substring(7))}`}
             >
               {questionData.answers[answerKey]}
             </div>
           ))}
       </div>
 
-      {/* Button to show the solution */}
-      <button onClick={handleShowAnswer}>Show Solution</button>
+      <button
+        onClick={handleShowAnswer}
+        disabled={!selectedAnswer || answered}
+        className={`mt-6 px-6 py-2 rounded-lg font-medium transition-colors
+          ${!selectedAnswer || answered 
+            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+      >
+        Check Answer
+      </button>
 
-      {/* Show the explanation after the answer is selected */}
       {answered && (
-        <div className="explanation">
-          <p><strong>Explanation:</strong> {questionData.explanation}</p>
+        <div className="mt-6">
+          <div className={`p-4 rounded-lg ${checkAnswer(selectedAnswer) ? 'bg-green-50' : 'bg-red-50'}`}>
+            <p className="font-medium mb-2">
+              {checkAnswer(selectedAnswer) ? '✅ Correct!' : '❌ Incorrect'}
+            </p>
+            <p className="text-gray-700">{questionData.explanation}</p>
+          </div>
+          <div className="mt-4 text-gray-600">
+            Score: {score}/{totalAttempts} ({((score/totalAttempts) * 100).toFixed(1)}%)
+          </div>
         </div>
       )}
     </div>
