@@ -3,7 +3,7 @@ import MainPage from "./pages/MainPage";
 import "./App.css";
 
 function App() {
-  //hiiii
+  //hi
   return (
     <div className="App">
       <header className="App-header">
