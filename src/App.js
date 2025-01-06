@@ -1,17 +1,38 @@
 import React from "react";
 import MainPage from "./pages/MainPage";
 import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { getApiData } from "./api/getApiData";
+import { Aptitude } from "./pages/Aptitude";
+import { Maths } from "./pages/Maths";
+import { Logical } from "./pages/Logical";
+import Home from "./pages/Home";
 
 function App() {
-  //hi
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Coding Platform</h1>
-      </header>
-      <MainPage />
-    </div>
-  );
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Home />,
+    },
+    {
+      path: "/logical",
+      element: <Logical />,
+    },
+    {
+      path: "/maths",
+      element: <Maths />,
+    },
+    {
+      path: "/aptitude",
+      element: <Aptitude />,
+      loader:getApiData,
+    },
+    {
+      path: "/coding",
+      element:<MainPage />
+    }
+  ]);
+  return <RouterProvider router={router} />;
 }
 
 export default App;
