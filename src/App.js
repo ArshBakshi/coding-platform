@@ -7,6 +7,7 @@ import { Aptitude } from "./pages/Aptitude";
 import { Maths } from "./pages/Maths";
 import { Logical } from "./pages/Logical";
 import { AppLayout } from "./layout/AppLayout";
+import { QuizResults } from "./components/QuizResults";
 
 function App() {
   const router = createBrowserRouter([
@@ -30,6 +31,10 @@ function App() {
         {
           path: "/coding",
           element: <MainPage />,
+        },
+        {
+          path:"/quiz-results",
+          element:<QuizResults />,
         },
       ],
     },

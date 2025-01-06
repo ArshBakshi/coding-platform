@@ -1,29 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const QuizQuestion = ({ questionData, onScoreUpdate }) => {
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answered, setAnswered] = useState(false);
-
-  const checkAnswer = (answerKey) => {
-    return questionData.correct_answers[`answer_${answerKey}_correct`] === "true";
-  };
-
+const QuizQuestion = ({ questionData, questionIndex, selectedAnswer, onAnswerSelect }) => {
   const handleAnswerSelection = (answerKey) => {
-    if (!answered) {
-      setSelectedAnswer(answerKey);
-      const isCorrect = checkAnswer(answerKey);
-      setAnswered(true);
-      onScoreUpdate(isCorrect);
-    }
-  };
-
-  const getAnswerClass = (answerKey) => {
-    if (!answered) return '';
-    if (checkAnswer(answerKey)) return 'bg-green-100 border-green-500';
-    if (answerKey === selectedAnswer && !checkAnswer(answerKey)) {
-      return 'bg-red-100 border-red-500';
-    }
-    return '';
+    onAnswerSelect(questionIndex, answerKey);
   };
 
   return (
@@ -45,25 +24,14 @@ const QuizQuestion = ({ questionData, onScoreUpdate }) => {
               key={index}
               onClick={() => handleAnswerSelection(answerKey.substring(7))}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-colors
-                ${!answered ? 'hover:bg-gray-50' : ''}
-                ${selectedAnswer === answerKey.substring(7) ? 'border-blue-500' : 'border-gray-200'}
-                ${getAnswerClass(answerKey.substring(7))}`}
+                ${selectedAnswer === answerKey.substring(7) 
+                  ? 'bg-blue-50 border-blue-500 shadow-sm' 
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
             >
               {questionData.answers[answerKey]}
             </div>
           ))}
       </div>
-
-      {answered && (
-        <div className="mt-6">
-          <div className={`p-4 rounded-lg ${checkAnswer(selectedAnswer) ? 'bg-green-50' : 'bg-red-50'}`}>
-            <p className="font-medium mb-2">
-              {checkAnswer(selectedAnswer) ? '✅ Correct!' : '❌ Incorrect'}
-            </p>
-            <p className="text-gray-700">{questionData.explanation}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
