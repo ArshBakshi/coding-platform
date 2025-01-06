@@ -1,28 +1,19 @@
 import React, { useState } from 'react';
 
-const QuizQuestion = ({ questionData }) => {
+const QuizQuestion = ({ questionData, onScoreUpdate }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [answered, setAnswered] = useState(false);
-  const [score, setScore] = useState(0);
-  const [totalAttempts, setTotalAttempts] = useState(0);
-
-  const handleAnswerSelection = (answerKey) => {
-    if (!answered) {
-      setSelectedAnswer(answerKey);
-    }
-  };
 
   const checkAnswer = (answerKey) => {
     return questionData.correct_answers[`answer_${answerKey}_correct`] === "true";
   };
 
-  const handleShowAnswer = () => {
-    if (selectedAnswer && !answered) {
+  const handleAnswerSelection = (answerKey) => {
+    if (!answered) {
+      setSelectedAnswer(answerKey);
+      const isCorrect = checkAnswer(answerKey);
       setAnswered(true);
-      setTotalAttempts(totalAttempts + 1);
-      if (checkAnswer(selectedAnswer)) {
-        setScore(score + 1);
-      }
+      onScoreUpdate(isCorrect);
     }
   };
 
@@ -54,7 +45,7 @@ const QuizQuestion = ({ questionData }) => {
               key={index}
               onClick={() => handleAnswerSelection(answerKey.substring(7))}
               className={`p-4 border-2 rounded-lg cursor-pointer transition-colors
-                ${!answered && !selectedAnswer ? 'hover:bg-gray-50' : ''}
+                ${!answered ? 'hover:bg-gray-50' : ''}
                 ${selectedAnswer === answerKey.substring(7) ? 'border-blue-500' : 'border-gray-200'}
                 ${getAnswerClass(answerKey.substring(7))}`}
             >
@@ -63,17 +54,6 @@ const QuizQuestion = ({ questionData }) => {
           ))}
       </div>
 
-      <button
-        onClick={handleShowAnswer}
-        disabled={!selectedAnswer || answered}
-        className={`mt-6 px-6 py-2 rounded-lg font-medium transition-colors
-          ${!selectedAnswer || answered 
-            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-      >
-        Check Answer
-      </button>
-
       {answered && (
         <div className="mt-6">
           <div className={`p-4 rounded-lg ${checkAnswer(selectedAnswer) ? 'bg-green-50' : 'bg-red-50'}`}>
@@ -81,9 +61,6 @@ const QuizQuestion = ({ questionData }) => {
               {checkAnswer(selectedAnswer) ? '✅ Correct!' : '❌ Incorrect'}
             </p>
             <p className="text-gray-700">{questionData.explanation}</p>
-          </div>
-          <div className="mt-4 text-gray-600">
-            Score: {score}/{totalAttempts} ({((score/totalAttempts) * 100).toFixed(1)}%)
           </div>
         </div>
       )}
