@@ -3,12 +3,12 @@ import MainPage from "./pages/MainPage";
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { getApiData } from "./api/getApiData";
-import { Aptitude } from "./pages/Aptitude";
 import { AppLayout } from "./layout/AppLayout";
 import { QuizResults } from "./components/QuizResults";
 import { Test } from "./pages/Test";
-import Exam  from "./components/Exam";
-
+import Exam from "./components/Exam";
+import { AptitudeQuiz } from "./pages/AptitudeQuiz";
+import { AptitudeTopics } from "./pages/AptitudeTopics";
 
 function App() {
   const router = createBrowserRouter([
@@ -18,8 +18,20 @@ function App() {
       children: [
         {
           path: "/aptitude",
-          element: <Aptitude />,
-          loader: getApiData,
+          element: <AptitudeTopics />,
+        },
+        {
+          path: "/aptitude/quiz",
+          element: <AptitudeQuiz />,
+          loader: ({ request }) => {
+            const url = new URL(request.url);
+            const category = url.searchParams.get("category");
+            return getApiData(category);
+          },
+        },
+        {
+          path: "/quiz-results",
+          element: <QuizResults />,
         },
         {
           path: "/coding",
@@ -32,10 +44,6 @@ function App() {
         {
           path: "/exam",
           element: <Exam />,
-        },
-        {
-          path: "/quiz-results",
-          element: <QuizResults />,
         },
       ],
     },
