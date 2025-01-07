@@ -4,11 +4,11 @@ import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { getApiData } from "./api/getApiData";
 import { Aptitude } from "./pages/Aptitude";
-import { Maths } from "./pages/Maths";
-import { Logical } from "./pages/Logical";
 import { AppLayout } from "./layout/AppLayout";
 import { QuizResults } from "./components/QuizResults";
 import { Test } from "./pages/Test";
+import Exam  from "./components/Exam";
+
 
 function App() {
   const router = createBrowserRouter([
@@ -28,6 +28,10 @@ function App() {
         {
           path: "/test",
           element: <Test />,
+        },
+        {
+          path: "/exam",
+          element: <Exam />,
         },
         {
           path: "/quiz-results",
