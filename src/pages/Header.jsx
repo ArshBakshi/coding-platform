@@ -20,22 +20,22 @@ const Header = () => {
           </li>
           <li>
             <NavLink
-              to="/test"
-              className={({ isActive }) =>
-                isActive ? "navbar-link active-link" : "navbar-link"
-              }
-            >
-              Test
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
               to="/aptitude"
               className={({ isActive }) =>
                 isActive ? "navbar-link active-link" : "navbar-link"
               }
             >
               Aptitude
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/test"
+              className={({ isActive }) =>
+                isActive ? "navbar-link active-link" : "navbar-link"
+              }
+            >
+              Test
             </NavLink>
           </li>
         </ul>

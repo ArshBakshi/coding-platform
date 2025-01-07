@@ -37,15 +37,17 @@ function App() {
           path: "/coding",
           element: <MainPage />,
         },
-        {
-          path: "/test",
-          element: <Test />,
-        },
-        {
-          path: "/exam",
-          element: <Exam />,
-        },
+        
+        
       ],
+    },
+    {
+      path: "/test",
+      element: <Test />,
+    },
+    {
+      path: "/exam",
+      element: <Exam />,
     },
   ]);
   return <RouterProvider router={router} />;
