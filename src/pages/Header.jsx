@@ -20,22 +20,12 @@ const Header = () => {
           </li>
           <li>
             <NavLink
-              to="/logical"
+              to="/test"
               className={({ isActive }) =>
                 isActive ? "navbar-link active-link" : "navbar-link"
               }
             >
-              Logical
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/maths"
-              className={({ isActive }) =>
-                isActive ? "navbar-link active-link" : "navbar-link"
-              }
-            >
-              Maths
+              Test
             </NavLink>
           </li>
           <li>

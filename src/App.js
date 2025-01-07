@@ -8,6 +8,7 @@ import { Maths } from "./pages/Maths";
 import { Logical } from "./pages/Logical";
 import { AppLayout } from "./layout/AppLayout";
 import { QuizResults } from "./components/QuizResults";
+import { Test } from "./pages/Test";
 
 function App() {
   const router = createBrowserRouter([
@@ -15,14 +16,6 @@ function App() {
       path: "/",
       element: <AppLayout />,
       children: [
-        {
-          path: "/logical",
-          element: <Logical />,
-        },
-        {
-          path: "/maths",
-          element: <Maths />,
-        },
         {
           path: "/aptitude",
           element: <Aptitude />,
@@ -33,8 +26,12 @@ function App() {
           element: <MainPage />,
         },
         {
-          path:"/quiz-results",
-          element:<QuizResults />,
+          path: "/test",
+          element: <Test />,
+        },
+        {
+          path: "/quiz-results",
+          element: <QuizResults />,
         },
       ],
     },
