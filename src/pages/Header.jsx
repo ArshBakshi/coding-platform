@@ -5,7 +5,10 @@ import { NavLink } from "react-router-dom";
 const Header = () => {
   return (
     <header className="navbar">
-      <div className="navbar-logo">My Quiz App</div>
+      <NavLink
+       to="/">
+        <div className="navbar-logo">My Quiz App</div>
+      </NavLink>
       <nav>
         <ul className="navbar-list">
           <li>

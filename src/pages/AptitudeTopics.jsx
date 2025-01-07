@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Code, Terminal, Database, Server, Box, Container, Globe } from "lucide-react";
+import { Code, Terminal, Server, Box, Container, Globe } from "lucide-react";
 
 export const AptitudeTopics = () => {
   const navigate = useNavigate();
