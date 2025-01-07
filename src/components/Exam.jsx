@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-java";
+import "ace-builds/src-noconflict/theme-monokai";
 
-// Hardcoded MCQ data
 const MOCK_QUESTIONS = [
   {
     question: "What is the capital of France?",
@@ -30,17 +34,200 @@ const MOCK_QUESTIONS = [
   }
 ];
 
+const CODING_QUESTIONS = [
+  {
+    id: 1,
+    title: "Two Sum",
+    description: "Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.",
+    examples: [
+      {
+        input: "nums = [2,7,11,15], target = 9",
+        output: "[0,1]",
+        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]"
+      }
+    ],
+    testCases: [
+      {
+        input: [2, 7, 11, 15],
+        target: 9,
+        expected: [0, 1]
+      },
+      {
+        input: [3, 2, 4],
+        target: 6,
+        expected: [1, 2]
+      }
+    ],
+    defaultCode: {
+      python: "def two_sum(nums, target):\n    # Your code here\n    pass",
+      javascript: "function twoSum(nums, target) {\n    // Your code here\n}",
+      java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return new int[]{};\n    }\n}"
+    }
+  },
+  {
+    id: 2,
+    title: "Palindrome Check",
+    description: "Write a function that checks if a given string is a palindrome.",
+    examples: [
+      {
+        input: "'racecar'",
+        output: "true",
+        explanation: "It reads the same forwards and backwards"
+      }
+    ],
+    testCases: [
+      {
+        input: "racecar",
+        expected: true
+      },
+      {
+        input: "hello",
+        expected: false
+      }
+    ],
+    defaultCode: {
+      python: "def is_palindrome(s):\n    # Your code here\n    pass",
+      javascript: "function isPalindrome(s) {\n    // Your code here\n}",
+      java: "class Solution {\n    public boolean isPalindrome(String s) {\n        // Your code here\n        return false;\n    }\n}"
+    }
+  }
+];
+
+const executeCode = async (code, language, testCases) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        results: testCases.map(test => ({
+          passed: Math.random() > 0.5,
+          input: test.input,
+          expected: test.expected,
+          actual: "Mock output"
+        }))
+      });
+    }, 1000);
+  });
+};
+
+const CodingSection = ({ currentQuestion, onSubmit }) => {
+  const [code, setCode] = useState(currentQuestion.defaultCode.python);
+  const [language, setLanguage] = useState("python");
+  const [results, setResults] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+    setCode(currentQuestion.defaultCode[newLanguage]);
+  };
+
+  const handleRun = async () => {
+    setIsRunning(true);
+    const executionResults = await executeCode(code, language, currentQuestion.testCases);
+    setResults(executionResults.results);
+    setIsRunning(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-xl font-bold mb-2">{currentQuestion.title}</h3>
+        <p className="mb-4">{currentQuestion.description}</p>
+        
+        <div className="bg-white p-4 rounded-lg mb-4">
+          <h4 className="font-semibold mb-2">Examples:</h4>
+          {currentQuestion.examples.map((example, idx) => (
+            <div key={idx} className="mb-2">
+              <p>Input: {example.input}</p>
+              <p>Output: {example.output}</p>
+              <p className="text-gray-600">{example.explanation}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-4 mb-4">
+        <select
+          value={language}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          className="px-4 py-2 border rounded-lg"
+        >
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+        </select>
+      </div>
+
+      <div className="border rounded-lg overflow-hidden">
+        <AceEditor
+          mode={language}
+          theme="monokai"
+          value={code}
+          onChange={setCode}
+          name="code-editor"
+          editorProps={{ $blockScrolling: true }}
+          width="100%"
+          height="400px"
+          fontSize={14}
+          showPrintMargin={false}
+          className="border-b"
+        />
+      </div>
+
+      <div className="flex space-x-4">
+        <button
+          onClick={handleRun}
+          disabled={isRunning}
+          className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+        >
+          {isRunning ? "Running..." : "Run Code"}
+        </button>
+        <button
+          onClick={() => onSubmit(code)}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Submit
+        </button>
+      </div>
+
+      {results && (
+        <div className="mt-6">
+          <h4 className="font-semibold mb-2">Test Results:</h4>
+          <div className="space-y-2">
+            {results.map((result, idx) => (
+              <div
+                key={idx}
+                className={`p-4 rounded-lg ${
+                  result.passed ? "bg-green-100" : "bg-red-100"
+                }`}
+              >
+                <div className="flex items-center">
+                  <span className={`mr-2 ${result.passed ? "text-green-600" : "text-red-600"}`}>
+                    {result.passed ? "✓" : "✗"}
+                  </span>
+                  <div>
+                    <p>Input: {JSON.stringify(result.input)}</p>
+                    <p>Expected: {JSON.stringify(result.expected)}</p>
+                    {!result.passed && <p>Actual: {JSON.stringify(result.actual)}</p>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Exam = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState(MOCK_QUESTIONS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+  const [timeLeft, setTimeLeft] = useState(600);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [isExamOver, setIsExamOver] = useState(false);
   const [isNPressed, setIsNPressed] = useState(false);
   const nKeyRef = useRef(false);
-
-  // Proctoring states
   const [status, setStatus] = useState({ person_count: 0, cellphone_detected: false });
   const [warnings, setWarnings] = useState({
     tabSwitch: 0,
@@ -55,37 +242,28 @@ const Exam = () => {
   const monitoringInterval = useRef(null);
   const visibilityTimeout = useRef(null);
   const blurTimeout = useRef(null);
-
-  // Monitoring states
   const [isInitialCheck, setIsInitialCheck] = useState(true);
   const [isCheckPassed, setIsCheckPassed] = useState(false);
   const [checkStatus, setCheckStatus] = useState("Initializing...");
+  const [examSection, setExamSection] = useState("mcq");
+  const [currentCodingIndex, setCurrentCodingIndex] = useState(0);
+  const [codingAnswers, setCodingAnswers] = useState({});
 
-  // Modified N key handler
   useEffect(() => {
-    console.log('Setting up N key handler');
-    
     const handleKeyPress = (event) => {
       if (event.key === 'n' || event.key === 'N') {
-        console.log('N key pressed - updating state');
         nKeyRef.current = true;
         setIsNPressed(true);
       }
       if (event.key === 'k' || event.key === 'K') {
-        console.log('K key pressed - terminating exam');
         navigate("/response");
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
-    
-    return () => {
-      console.log('Cleaning up N key handler');
-      window.removeEventListener('keydown', handleKeyPress);
-    };
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
-  // Initialize exam and monitoring
   useEffect(() => {
     if (isInitialCheck) {
       startProctoring();
@@ -98,7 +276,6 @@ const Exam = () => {
     }
   }, []);
 
-  // Start continuous monitoring after exam starts
   useEffect(() => {
     if (isCheckPassed && !isExamOver) {
       monitoringInterval.current = setInterval(() => {
@@ -122,19 +299,15 @@ const Exam = () => {
     }
   }, [isCheckPassed, isExamOver]);
 
-  // Timer effect
   useEffect(() => {
     if (timeLeft > 0 && !isExamOver && isCheckPassed) {
-      const timer = setTimeout(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
+      const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0) {
       handleExamEnd("Time's up!");
     }
   }, [timeLeft, isExamOver, isCheckPassed]);
 
-  // Start proctoring
   const startProctoring = () => {
     fetch("http://127.0.0.1:5000/start")
       .then((response) => response.json())
@@ -144,14 +317,12 @@ const Exam = () => {
       });
   };
 
-  // Stop proctoring
   const stopProctoring = () => {
     fetch("http://127.0.0.1:5000/stop")
       .then((response) => response.json())
       .catch((error) => console.error("Error stopping proctoring:", error));
   };
 
-  // Monitor tab switching and window focus
   const monitorTabSwitch = () => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && !isInitialCheck) {
@@ -200,9 +371,7 @@ const Exam = () => {
     };
   };
 
-  // Handle violations
   const handleViolations = (data) => {
-    // No person detected
     if (data.person_count === 0) {
       setWarnings((prev) => {
         const newCount = prev.noPerson + 1;
@@ -218,313 +387,308 @@ const Exam = () => {
       setWarnings((prev) => ({ ...prev, noPerson: 0 }));
     }
 
-    // Multiple people
     if (data.person_count > 1) {
       setWarnings((prev) => {
         const newCount = prev.multiplePeople + 1;
-        if (newCount === 1) {
-          addAlert("⚠️ Warning: Multiple people detected!", "warning");
-          captureViolationScreenshot();
-        } else if (newCount >= 3) {
-          handleExamEnd("Test terminated: Multiple people detected repeatedly");
-        }
-        return { ...prev, multiplePeople: newCount };
-      });
-    } else {
-      setWarnings((prev) => ({ ...prev, multiplePeople: 0 }));
-    }
+if (newCount === 1) {
+ addAlert("⚠️ Warning: Multiple people detected!", "warning");
+ captureViolationScreenshot();
+} else if (newCount >= 3) {
+ handleExamEnd("Test terminated: Multiple people detected repeatedly");
+}
+return { ...prev, multiplePeople: newCount };
+});
+} else {
+setWarnings((prev) => ({ ...prev, multiplePeople: 0 }));
+}
 
-    // Cellphone detection
-    if (data.cellphone_detected) {
-      setWarnings((prev) => {
-        const newCount = prev.cellphone + 1;
-        if (newCount === 1) {
-          addAlert("⚠️ Warning: Cell phone detected!", "warning");
-          captureViolationScreenshot();
-        } else if (newCount >= 2) {
-          handleExamEnd("Test terminated: Cell phone detected multiple times");
-        }
-        return { ...prev, cellphone: newCount };
-      });
-    } else {
-      setWarnings((prev) => ({ ...prev, cellphone: 0 }));
-    }
-  };
+if (data.cellphone_detected) {
+setWarnings((prev) => {
+ const newCount = prev.cellphone + 1;
+ if (newCount === 1) {
+   addAlert("⚠️ Warning: Cell phone detected!", "warning");
+   captureViolationScreenshot();
+ } else if (newCount >= 2) {
+   handleExamEnd("Test terminated: Cell phone detected multiple times");
+ }
+ return { ...prev, cellphone: newCount };
+});
+} else {
+setWarnings((prev) => ({ ...prev, cellphone: 0 }));
+}
+};
 
-  // Initial environment check
-  const checkEnvironment = () => {
-    console.log('Starting environment check');
-    
-    const checkInterval = setInterval(() => {
-      console.log('Checking environment...', { isNPressed: nKeyRef.current });
-      
-      fetch("http://127.0.0.1:5000/status")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log('Status data:', data);
-          setStatus(data);
-          
-          if (data.cellphone_detected) {
-            setCheckStatus("⚠️ Please remove any phones from the camera view");
-          } else if (data.person_count === 0) {
-            setCheckStatus("👤 Please position yourself in front of the camera");
-          } else if (data.person_count > 1) {
-            setCheckStatus("⚠️ Only one person should be visible");
-          } else if (data.person_count === 1 && !data.cellphone_detected) {
-            if (!nKeyRef.current) {
-              setCheckStatus("Press 'N' to start the exam...");
-            } else {
-              console.log('All conditions met, transitioning to exam');
-              setCheckStatus("✅ Environment check passed! Starting exam in 3 seconds...");
-              
-              // Clear the interval immediately
-              clearInterval(checkInterval);
-              
-              // Set a 3-second delay before setting the final states
-              setTimeout(() => {
-                setIsInitialCheck(false);
-                setIsCheckPassed(true);
-              }, 3000);
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          setCheckStatus("⚠️ Error connecting to proctoring system");
-        });
-    }, 1000);
+const checkEnvironment = () => {
+console.log('Starting environment check');
 
-    return () => {
-      console.log('Cleaning up interval');
-      clearInterval(checkInterval);
-    };
-  };
+const checkInterval = setInterval(() => {
+ console.log('Checking environment...', { isNPressed: nKeyRef.current });
+ 
+ fetch("http://127.0.0.1:5000/status")
+   .then((response) => response.json())
+   .then((data) => {
+     console.log('Status data:', data);
+     setStatus(data);
+     
+     if (data.cellphone_detected) {
+       setCheckStatus("⚠️ Please remove any phones from the camera view");
+     } else if (data.person_count === 0) {
+       setCheckStatus("👤 Please position yourself in front of the camera");
+     } else if (data.person_count > 1) {
+       setCheckStatus("⚠️ Only one person should be visible");
+     } else if (data.person_count === 1 && !data.cellphone_detected) {
+       if (!nKeyRef.current) {
+         setCheckStatus("Press 'N' to start the exam...");
+       } else {
+         console.log('All conditions met, transitioning to exam');
+         setCheckStatus("✅ Environment check passed! Starting exam in 3 seconds...");
+         
+         clearInterval(checkInterval);
+         
+         setTimeout(() => {
+           setIsInitialCheck(false);
+           setIsCheckPassed(true);
+         }, 3000);
+       }
+     }
+   })
+   .catch((error) => {
+     console.error("Error:", error);
+     setCheckStatus("⚠️ Error connecting to proctoring system");
+   });
+}, 1000);
 
-  // Capture violation screenshot
-  const captureViolationScreenshot = () => {
-    fetch("http://127.0.0.1:5000/screenshot")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Violation screenshot captured:", data.filename);
-      })
-      .catch((error) => console.error("Error capturing screenshot:", error));
-  };
+return () => clearInterval(checkInterval);
+};
 
-  // Add alert
-  const addAlert = (message, type = "warning") => {
-    const id = alertIdCounter.current++;
-    setAlerts((prev) => [...prev, { id, message, type }]);
-    if (type === "warning") {
-      setTimeout(() => {
-        setAlerts((prev) => prev.filter((alert) => alert.id !== id));
-      }, 5000);
-    }
-  };
+const captureViolationScreenshot = () => {
+fetch("http://127.0.0.1:5000/screenshot")
+ .then((response) => response.json())
+ .then((data) => console.log("Violation screenshot captured:", data.filename))
+ .catch((error) => console.error("Error capturing screenshot:", error));
+};
 
-  // Handle answer selection
-  const handleAnswerSelect = (answer) => {
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [currentQuestionIndex]: answer,
-    }));
-  };
+const addAlert = (message, type = "warning") => {
+const id = alertIdCounter.current++;
+setAlerts((prev) => [...prev, { id, message, type }]);
+if (type === "warning") {
+ setTimeout(() => {
+   setAlerts((prev) => prev.filter((alert) => alert.id !== id));
+ }, 5000);
+}
+};
 
-  // Handle next question
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
+const handleAnswerSelect = (answer) => {
+setSelectedAnswers((prev) => ({
+ ...prev,
+ [currentQuestionIndex]: answer,
+}));
+};
 
-  // Handle previous question
-  const handlePrevQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
+const handleSectionSwitch = (section) => {
+setExamSection(section);
+};
 
-  // Handle exam end
-  const handleExamEnd = (reason) => {
-    setIsExamOver(true);
-    stopProctoring();
-    // Store answers and reason in sessionStorage
-    sessionStorage.setItem("examAnswers", JSON.stringify(selectedAnswers));
-    sessionStorage.setItem("examEndReason", reason);
-    navigate("/response");
-  };
+const handleCodingSubmit = (code) => {
+setCodingAnswers(prev => ({
+ ...prev,
+ [currentCodingIndex]: code
+}));
+};
 
-  // Render initial check screen
-  if (isInitialCheck) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="p-8 bg-white rounded-lg shadow-lg max-w-md w-full text-center">
-          <h1 className="text-2xl font-bold mb-6">Environment Check</h1>
-          <div className="mb-6">
-            <div className="text-lg mb-4">{checkStatus}</div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span>Camera Connected:</span>
-                <span className="font-bold">✅</span>
-              </div>
-              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span>Person Detected:</span>
-                <span className={`font-bold ${status.person_count === 1 ? "text-green-600" : "text-red-600"}`}>
-                  {status.person_count === 1 && isNPressed ? "✅" : "❌"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span>No Phone Detected:</span>
-                <span className={`font-bold ${!status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
-                  {!status.cellphone_detected ? "✅" : "❌"}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="text-sm text-gray-600">
-            Please ensure:
-            <ul className="list-disc text-left pl-5 mt-2">
-              <li>You are clearly visible in the camera</li>
-              <li>No phones or other devices are visible</li>
-              <li>You are in a well-lit environment</li>
-              <li>You are the only person visible in the frame</li>
-              <li>Press 'N' when ready to start the exam</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    );
-  }
+const handleExamEnd = (reason) => {
+setIsExamOver(true);
+stopProctoring();
+sessionStorage.setItem("examAnswers", JSON.stringify({
+ mcq: selectedAnswers,
+ coding: codingAnswers
+}));
+sessionStorage.setItem("examEndReason", reason);
+navigate("/response");
+};
 
-  // Render main exam screen
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
-       {/* Header */}
-<div className="flex justify-between items-center mb-6">
-  <h1 className="text-2xl font-bold">Online Exam</h1>
-  <div className="text-xl font-semibold">
-    Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
-  </div>
+if (isInitialCheck) {
+return (
+ <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+   <div className="p-8 bg-white rounded-lg shadow-lg max-w-md w-full text-center">
+     <h1 className="text-2xl font-bold mb-6">Environment Check</h1>
+     <div className="mb-6">
+       <div className="text-lg mb-4">{checkStatus}</div>
+       <div className="space-y-2">
+         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+           <span>Camera Connected:</span>
+           <span className="font-bold">✅</span>
+         </div>
+         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+           <span>Person Detected:</span>
+           <span className={`font-bold ${status.person_count === 1 ? "text-green-600" : "text-red-600"}`}>
+             {status.person_count === 1 && isNPressed ? "✅" : "❌"}
+           </span>
+         </div>
+         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+           <span>No Phone Detected:</span>
+           <span className={`font-bold ${!status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
+             {!status.cellphone_detected ? "✅" : "❌"}
+           </span>
+         </div>
+       </div>
+     </div>
+     <div className="text-sm text-gray-600">
+       Please ensure:
+       <ul className="list-disc text-left pl-5 mt-2">
+         <li>You are clearly visible in the camera</li>
+         <li>No phones or other devices are visible</li>
+         <li>You are in a well-lit environment</li>
+         <li>You are the only person visible in the frame</li>
+         <li>Press 'N' when ready to start the exam</li>
+       </ul>
+     </div>
+   </div>
+ </div>
+);
+}
+
+return (
+<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+ <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+   <div className="flex justify-between items-center mb-6">
+     <h1 className="text-2xl font-bold">Online Exam</h1>
+     <div className="text-xl font-semibold">
+       Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+     </div>
+   </div>
+
+   <div className="flex space-x-4 mb-6">
+     <button
+       onClick={() => handleSectionSwitch("mcq")}
+       className={`px-4 py-2 rounded-lg ${
+         examSection === "mcq"
+           ? "bg-blue-500 text-white"
+           : "bg-gray-200 hover:bg-gray-300"
+       }`}
+     >
+       Multiple Choice
+     </button>
+     <button
+       onClick={() => handleSectionSwitch("coding")}
+       className={`px-4 py-2 rounded-lg ${
+         examSection === "coding"
+           ? "bg-blue-500 text-white"
+           : "bg-gray-200 hover:bg-gray-300"
+       }`}
+     >
+       Coding Questions
+     </button>
+   </div>
+
+   {examSection === "mcq" ? (
+     <div>
+       <div className="flex justify-between mb-4">
+         <h2 className="text-lg font-semibold">
+           Question {currentQuestionIndex + 1} of {questions.length}
+         </h2>
+         <span className="text-gray-600">
+           {selectedAnswers[currentQuestionIndex] ? "Answered" : "Not answered"}
+         </span>
+       </div>
+       
+       <div className="mb-6">
+         <p className="text-lg mb-4">{questions[currentQuestionIndex]?.question}</p>
+         <div className="space-y-3">
+           {questions[currentQuestionIndex]?.options.map((option, index) => (
+             <div
+               key={index}
+               onClick={() => handleAnswerSelect(option)}
+               className={`p-3 rounded-lg border cursor-pointer transition-colors
+                 ${
+                   selectedAnswers[currentQuestionIndex] === option
+                     ? "bg-blue-100 border-blue-500"
+                     : "hover:bg-gray-50"
+                 }`}
+             >
+               {option}
+             </div>
+           ))}
+         </div>
+       </div>
+
+       <div className="flex justify-between items-center">
+         <button
+           onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+           disabled={currentQuestionIndex === 0}
+           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+         >
+           Previous
+         </button>
+         <button
+           onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+           disabled={currentQuestionIndex === questions.length - 1}
+           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+         >
+           Next
+         </button>
+       </div>
+     </div>
+   ) : (
+     <div>
+       <div className="flex justify-between mb-4">
+         <h2 className="text-lg font-semibold">
+           Question {currentCodingIndex + 1} of {CODING_QUESTIONS.length}
+         </h2>
+       </div>
+       
+       <CodingSection
+         currentQuestion={CODING_QUESTIONS[currentCodingIndex]}
+         onSubmit={handleCodingSubmit}
+       />
+
+       <div className="flex justify-between mt-6">
+         <button
+           onClick={() => setCurrentCodingIndex(prev => Math.max(0, prev - 1))}
+           disabled={currentCodingIndex === 0}
+           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+         >
+           Previous
+         </button>
+         <button
+           onClick={() => setCurrentCodingIndex(prev => Math.min(CODING_QUESTIONS.length - 1, prev + 1))}
+           disabled={currentCodingIndex === CODING_QUESTIONS.length - 1}
+           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+         >
+           Next
+         </button>
+       </div>
+     </div>
+   )}
+
+   <div className="mt-6 flex justify-center">
+     <button
+       onClick={() => handleExamEnd("Exam submitted by user")}
+       className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+     >
+       Submit Exam
+     </button>
+   </div>
+ </div>
+
+ <div className="fixed top-4 right-4 w-80 space-y-2">
+   {alerts.map((alert) => (
+     <div
+       key={alert.id}
+       className={`p-4 rounded-lg shadow-lg ${
+         alert.type === "error"
+           ? "bg-red-500 text-white"
+           : alert.type === "warning"
+           ? "bg-yellow-100 text-yellow-800"
+           : "bg-green-100 text-green-800"
+       }`}
+     >
+       {alert.message}
+     </div>
+   ))}
+ </div>
 </div>
-
-{/* Proctoring Status */}
-<div className="mb-6 p-3 bg-gray-50 rounded-lg flex justify-between items-center">
-  <span>Proctoring Status:</span>
-  <span className={`font-bold ${status.person_count === 1 && !status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
-    {status.person_count === 1 && !status.cellphone_detected ? "✅ Active" : "⚠️ Check Camera"}
-  </span>
-</div>
-
-{/* Question Section */}
-<div className="mb-6">
-  <div className="flex justify-between mb-4">
-    <h2 className="text-lg font-semibold">
-      Question {currentQuestionIndex + 1} of {questions.length}
-    </h2>
-    <span className="text-gray-600">
-      {selectedAnswers[currentQuestionIndex] ? "Answered" : "Not answered"}
-    </span>
-  </div>
-  
-  <div className="mb-6">
-    <p className="text-lg mb-4">{questions[currentQuestionIndex]?.question}</p>
-    <div className="space-y-3">
-      {questions[currentQuestionIndex]?.options.map((option, index) => (
-        <div
-          key={index}
-          onClick={() => handleAnswerSelect(option)}
-          className={`p-3 rounded-lg border cursor-pointer transition-colors
-            ${
-              selectedAnswers[currentQuestionIndex] === option
-                ? "bg-blue-100 border-blue-500"
-                : "hover:bg-gray-50"
-            }`}
-        >
-          {option}
-        </div>
-      ))}
-    </div>
-  </div>
-</div>
-
-{/* Navigation Buttons */}
-<div className="flex justify-between items-center">
-  <button
-    onClick={handlePrevQuestion}
-    disabled={currentQuestionIndex === 0}
-    className={`px-4 py-2 rounded-lg ${
-      currentQuestionIndex === 0
-        ? "bg-gray-300 cursor-not-allowed"
-        : "bg-blue-500 hover:bg-blue-600 text-white"
-    }`}
-  >
-    Previous
-  </button>
-
-  <div className="flex space-x-4">
-    <button
-      onClick={() => handleExamEnd("Exam submitted by user")}
-      className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-    >
-      Submit Exam
-    </button>
-    
-    <button
-      onClick={handleNextQuestion}
-      disabled={currentQuestionIndex === questions.length - 1}
-      className={`px-4 py-2 rounded-lg ${
-        currentQuestionIndex === questions.length - 1
-          ? "bg-gray-300 cursor-not-allowed"
-          : "bg-blue-500 hover:bg-blue-600 text-white"
-      }`}
-    >
-      Next
-    </button>
-  </div>
-</div>
-
-{/* Question Navigator */}
-<div className="mt-8 border-t pt-4">
-  <h3 className="text-lg font-semibold mb-3">Question Navigator</h3>
-  <div className="flex flex-wrap gap-2">
-    {questions.map((_, index) => (
-      <button
-        key={index}
-        onClick={() => setCurrentQuestionIndex(index)}
-        className={`w-10 h-10 rounded-lg flex items-center justify-center
-          ${
-            currentQuestionIndex === index
-              ? "bg-blue-500 text-white"
-              : selectedAnswers[index]
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100"
-          }`}
-      >
-        {index + 1}
-      </button>
-    ))}
-  </div>
-</div>
-</div>
-
-{/* Alerts */}
-<div className="fixed top-4 right-4 w-80 space-y-2">
-  {alerts.map((alert) => (
-    <div
-      key={alert.id}
-      className={`p-4 rounded-lg shadow-lg ${
-        alert.type === "error"
-          ? "bg-red-500 text-white"
-          : alert.type === "warning"
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-green-100 text-green-800"
-      }`}
-    >
-      {alert.message}
-    </div>
-  ))}
-</div>
-</div>);
+);
 };
 
 export default Exam;
