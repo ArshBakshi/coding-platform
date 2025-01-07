@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/mode-java";
-import "ace-builds/src-noconflict/theme-monokai";
 
 const MOCK_QUESTIONS = [
   {
@@ -92,21 +87,63 @@ const CODING_QUESTIONS = [
     }
   }
 ];
-
 const executeCode = async (code, language, testCases) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        results: testCases.map(test => ({
-          passed: Math.random() > 0.5,
-          input: test.input,
-          expected: test.expected,
-          actual: "Mock output"
-        }))
-      });
-    }, 1000);
-  });
+  const runTestCase = (testCase, code, language) => {
+    try {
+      let result;
+      if (language === 'javascript') {
+        if (code.includes('twoSum')) {
+          const fn = new Function('nums', 'target', `
+            ${code}
+            return twoSum(nums, target);
+          `);
+          result = fn(testCase.input, testCase.target);
+        } else if (code.includes('isPalindrome')) {
+          const fn = new Function('s', `
+            ${code}
+            return isPalindrome(s);
+          `);
+          result = fn(testCase.input);
+        }
+
+        // Deep comparison for arrays and primitives
+        const passed = Array.isArray(result) ? 
+          JSON.stringify(result.sort()) === JSON.stringify(testCase.expected.sort()) :
+          result === testCase.expected;
+
+        return {
+          passed,
+          actual: result,
+          error: null
+        };
+      } else if (language === 'python' || language === 'java') {
+        // Mock execution for Python/Java - you'll need backend service
+        return {
+          passed: false,
+          actual: null,
+          error: `${language} execution requires backend service integration`
+        };
+      }
+    } catch (error) {
+      return {
+        passed: false,
+        actual: null,
+        error: error.message
+      };
+    }
+  };
+
+  const results = testCases.map(testCase => ({
+    ...runTestCase(testCase, code, language),
+    input: testCase.input,
+    target: testCase.target,
+    expected: testCase.expected
+  }));
+
+  return {
+    success: results.some(r => r.passed),
+    results
+  };
 };
 
 const CodingSection = ({ currentQuestion, onSubmit }) => {
@@ -114,6 +151,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
   const [language, setLanguage] = useState("python");
   const [results, setResults] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [testsPassed, setTestsPassed] = useState(0);
 
   const handleLanguageChange = (newLanguage) => {
     setLanguage(newLanguage);
@@ -124,9 +162,17 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
     setIsRunning(true);
     const executionResults = await executeCode(code, language, currentQuestion.testCases);
     setResults(executionResults.results);
+    const passed = executionResults.results.filter(r => r.passed).length;
+    setTestsPassed(passed);
     setIsRunning(false);
+    
+    onSubmit({
+      code,
+      language,
+      testsPassed: passed,
+      totalTests: currentQuestion.testCases.length
+    });
   };
-
   return (
     <div className="space-y-6">
       <div className="bg-gray-50 p-4 rounded-lg">
@@ -157,21 +203,12 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
         </select>
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
-        <AceEditor
-          mode={language}
-          theme="monokai"
-          value={code}
-          onChange={setCode}
-          name="code-editor"
-          editorProps={{ $blockScrolling: true }}
-          width="100%"
-          height="400px"
-          fontSize={14}
-          showPrintMargin={false}
-          className="border-b"
-        />
-      </div>
+      <textarea
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        className="w-full h-96 font-mono p-4 border rounded-lg"
+        spellCheck="false"
+      />
 
       <div className="flex space-x-4">
         <button
@@ -181,12 +218,6 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
         >
           {isRunning ? "Running..." : "Run Code"}
         </button>
-        <button
-          onClick={() => onSubmit(code)}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Submit
-        </button>
       </div>
 
       {results && (
@@ -194,34 +225,34 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
           <h4 className="font-semibold mb-2">Test Results:</h4>
           <div className="space-y-2">
             {results.map((result, idx) => (
-              <div
-                key={idx}
-                className={`p-4 rounded-lg ${
-                  result.passed ? "bg-green-100" : "bg-red-100"
-                }`}
-              >
+              <div key={idx} className={`p-4 rounded-lg ${result.passed ? "bg-green-100" : "bg-red-100"}`}>
                 <div className="flex items-center">
-                  <span className={`mr-2 ${result.passed ? "text-green-600" : "text-red-600"}`}>
+                  <span className={result.passed ? "text-green-600" : "text-red-600"}>
                     {result.passed ? "✓" : "✗"}
                   </span>
-                  <div>
+                  <div className="ml-2">
                     <p>Input: {JSON.stringify(result.input)}</p>
+                    {result.target !== undefined && <p>Target: {JSON.stringify(result.target)}</p>}
                     <p>Expected: {JSON.stringify(result.expected)}</p>
-                    {!result.passed && <p>Actual: {JSON.stringify(result.actual)}</p>}
+                    {!result.passed && (
+                      <p>Actual: {result.error ? `Error: ${result.error}` : JSON.stringify(result.actual)}</p>
+                    )}
                   </div>
                 </div>
               </div>
             ))}
+            <div className="mt-4 font-semibold">
+              Tests Passed: {testsPassed}/{currentQuestion.testCases.length}
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 };
-
 const Exam = () => {
   const navigate = useNavigate();
-  const [questions, setQuestions] = useState(MOCK_QUESTIONS);
+  const [questions] = useState(MOCK_QUESTIONS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(600);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -248,15 +279,15 @@ const Exam = () => {
   const [examSection, setExamSection] = useState("mcq");
   const [currentCodingIndex, setCurrentCodingIndex] = useState(0);
   const [codingAnswers, setCodingAnswers] = useState({});
-
+  const [examResults, setExamResults] = useState({
+    mcq: {},
+    coding: {}
+  });
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === 'n' || event.key === 'N') {
         nKeyRef.current = true;
         setIsNPressed(true);
-      }
-      if (event.key === 'k' || event.key === 'K') {
-        navigate("/response");
       }
     };
 
@@ -322,7 +353,6 @@ const Exam = () => {
       .then((response) => response.json())
       .catch((error) => console.error("Error stopping proctoring:", error));
   };
-
   const monitorTabSwitch = () => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && !isInitialCheck) {
@@ -390,305 +420,311 @@ const Exam = () => {
     if (data.person_count > 1) {
       setWarnings((prev) => {
         const newCount = prev.multiplePeople + 1;
-if (newCount === 1) {
- addAlert("⚠️ Warning: Multiple people detected!", "warning");
- captureViolationScreenshot();
-} else if (newCount >= 3) {
- handleExamEnd("Test terminated: Multiple people detected repeatedly");
-}
-return { ...prev, multiplePeople: newCount };
-});
-} else {
-setWarnings((prev) => ({ ...prev, multiplePeople: 0 }));
-}
+        if (newCount === 1) {
+          addAlert("⚠️ Warning: Multiple people detected!", "warning");
+          captureViolationScreenshot();
+        } else if (newCount >= 3) {
+          handleExamEnd("Test terminated: Multiple people detected repeatedly");
+        }
+        return { ...prev, multiplePeople: newCount };
+      });
+    } else {
+      setWarnings((prev) => ({ ...prev, multiplePeople: 0 }));
+    }
 
-if (data.cellphone_detected) {
-setWarnings((prev) => {
- const newCount = prev.cellphone + 1;
- if (newCount === 1) {
-   addAlert("⚠️ Warning: Cell phone detected!", "warning");
-   captureViolationScreenshot();
- } else if (newCount >= 2) {
-   handleExamEnd("Test terminated: Cell phone detected multiple times");
- }
- return { ...prev, cellphone: newCount };
-});
-} else {
-setWarnings((prev) => ({ ...prev, cellphone: 0 }));
-}
-};
+    if (data.cellphone_detected) {
+      setWarnings((prev) => {
+        const newCount = prev.cellphone + 1;
+        if (newCount === 1) {
+          addAlert("⚠️ Warning: Cell phone detected!", "warning");
+          captureViolationScreenshot();
+        } else if (newCount >= 2) {
+          handleExamEnd("Test terminated: Cell phone detected multiple times");
+        }
+        return { ...prev, cellphone: newCount };
+      });
+    } else {
+      setWarnings((prev) => ({ ...prev, cellphone: 0 }));
+    }
+  };
+  const checkEnvironment = () => {
+    console.log('Starting environment check');
 
-const checkEnvironment = () => {
-console.log('Starting environment check');
+    const checkInterval = setInterval(() => {
+      console.log('Checking environment...', { isNPressed: nKeyRef.current });
+      
+      fetch("http://127.0.0.1:5000/status")
+        .then((response) => response.json())
+        .then((data) => {
+          setStatus(data);
+          
+          if (data.cellphone_detected) {
+            setCheckStatus("⚠️ Please remove any phones from the camera view");
+          } else if (data.person_count === 0) {
+            setCheckStatus("👤 Please position yourself in front of the camera");
+          } else if (data.person_count > 1) {
+            setCheckStatus("⚠️ Only one person should be visible");
+          } else if (data.person_count === 1 && !data.cellphone_detected) {
+            if (!nKeyRef.current) {
+              setCheckStatus("Press 'N' to start the exam...");
+            } else {
+              setCheckStatus("✅ Environment check passed! Starting exam in 3 seconds...");
+              clearInterval(checkInterval);
+              setTimeout(() => {
+                setIsInitialCheck(false);
+                setIsCheckPassed(true);
+              }, 3000);
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setCheckStatus("⚠️ Error connecting to proctoring system");
+        });
+    }, 1000);
 
-const checkInterval = setInterval(() => {
- console.log('Checking environment...', { isNPressed: nKeyRef.current });
- 
- fetch("http://127.0.0.1:5000/status")
-   .then((response) => response.json())
-   .then((data) => {
-     console.log('Status data:', data);
-     setStatus(data);
-     
-     if (data.cellphone_detected) {
-       setCheckStatus("⚠️ Please remove any phones from the camera view");
-     } else if (data.person_count === 0) {
-       setCheckStatus("👤 Please position yourself in front of the camera");
-     } else if (data.person_count > 1) {
-       setCheckStatus("⚠️ Only one person should be visible");
-     } else if (data.person_count === 1 && !data.cellphone_detected) {
-       if (!nKeyRef.current) {
-         setCheckStatus("Press 'N' to start the exam...");
-       } else {
-         console.log('All conditions met, transitioning to exam');
-         setCheckStatus("✅ Environment check passed! Starting exam in 3 seconds...");
-         
-         clearInterval(checkInterval);
-         
-         setTimeout(() => {
-           setIsInitialCheck(false);
-           setIsCheckPassed(true);
-         }, 3000);
-       }
-     }
-   })
-   .catch((error) => {
-     console.error("Error:", error);
-     setCheckStatus("⚠️ Error connecting to proctoring system");
-   });
-}, 1000);
+    return () => clearInterval(checkInterval);
+  };
 
-return () => clearInterval(checkInterval);
-};
+  const captureViolationScreenshot = () => {
+    fetch("http://127.0.0.1:5000/screenshot")
+      .then((response) => response.json())
+      .then((data) => console.log("Violation screenshot captured:", data.filename))
+      .catch((error) => console.error("Error capturing screenshot:", error));
+  };
 
-const captureViolationScreenshot = () => {
-fetch("http://127.0.0.1:5000/screenshot")
- .then((response) => response.json())
- .then((data) => console.log("Violation screenshot captured:", data.filename))
- .catch((error) => console.error("Error capturing screenshot:", error));
-};
+  const addAlert = (message, type = "warning") => {
+    const id = alertIdCounter.current++;
+    setAlerts((prev) => [...prev, { id, message, type }]);
+    if (type === "warning") {
+      setTimeout(() => {
+        setAlerts((prev) => prev.filter((alert) => alert.id !== id));
+      }, 5000);
+    }
+  };
 
-const addAlert = (message, type = "warning") => {
-const id = alertIdCounter.current++;
-setAlerts((prev) => [...prev, { id, message, type }]);
-if (type === "warning") {
- setTimeout(() => {
-   setAlerts((prev) => prev.filter((alert) => alert.id !== id));
- }, 5000);
-}
-};
+  const handleAnswerSelect = (answer) => {
+    const newAnswers = {
+      ...selectedAnswers,
+      [currentQuestionIndex]: answer,
+    };
+    setSelectedAnswers(newAnswers);
+    setExamResults(prev => ({
+      ...prev,
+      mcq: newAnswers
+    }));
+  };
 
-const handleAnswerSelect = (answer) => {
-setSelectedAnswers((prev) => ({
- ...prev,
- [currentQuestionIndex]: answer,
-}));
-};
+  const handleSectionSwitch = (section) => {
+    setExamSection(section);
+  };
 
-const handleSectionSwitch = (section) => {
-setExamSection(section);
-};
+  const handleCodingSubmit = (codingResult) => {
+    const newCodingAnswers = {
+      ...codingAnswers,
+      [currentCodingIndex]: codingResult
+    };
+    setCodingAnswers(newCodingAnswers);
+    setExamResults(prev => ({
+      ...prev,
+      coding: newCodingAnswers
+    }));
+  };
+  const handleExamEnd = (reason) => {
+    setIsExamOver(true);
+    stopProctoring();
+    
+    const finalResults = {
+      mcq: {
+        answers: selectedAnswers,
+        score: Object.entries(selectedAnswers).reduce((acc, [idx, answer]) => {
+          return acc + (answer === MOCK_QUESTIONS[idx].correct_answer ? 1 : 0);
+        }, 0),
+        total: MOCK_QUESTIONS.length
+      },
+      coding: {
+        answers: codingAnswers,
+        score: Object.values(codingAnswers).reduce((acc, result) => {
+          return acc + (result.testsPassed || 0);
+        }, 0),
+        total: Object.values(codingAnswers).reduce((acc, result) => {
+          return acc + (result.totalTests || 0);
+        }, 0)
+      }
+    };
 
-const handleCodingSubmit = (code) => {
-setCodingAnswers(prev => ({
- ...prev,
- [currentCodingIndex]: code
-}));
-};
+    sessionStorage.setItem("examResults", JSON.stringify(finalResults));
+    sessionStorage.setItem("examEndReason", reason);
+    navigate("/response");
+  };
 
-const handleExamEnd = (reason) => {
-setIsExamOver(true);
-stopProctoring();
-sessionStorage.setItem("examAnswers", JSON.stringify({
- mcq: selectedAnswers,
- coding: codingAnswers
-}));
-sessionStorage.setItem("examEndReason", reason);
-navigate("/response");
-};
+  if (isInitialCheck) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="p-8 bg-white rounded-lg shadow-lg max-w-md w-full text-center">
+          <h1 className="text-2xl font-bold mb-6">Environment Check</h1>
+          <div className="mb-6">
+            <div className="text-lg mb-4">{checkStatus}</div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span>Camera Connected:</span>
+                <span className="font-bold">✅</span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span>Person Detected:</span>
+                <span className={`font-bold ${status.person_count === 1 ? "text-green-600" : "text-red-600"}`}>
+                  {status.person_count === 1 && isNPressed ? "✅" : "❌"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <span>No Phone Detected:</span>
+                <span className={`font-bold ${!status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
+                  {!status.cellphone_detected ? "✅" : "❌"}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="text-sm text-gray-600">
+            Please ensure:
+            <ul className="list-disc text-left pl-5 mt-2">
+              <li>You are clearly visible in the camera</li>
+              <li>No phones or other devices are visible</li>
+              <li>You are in a well-lit environment</li>
+              <li>You are the only person visible in the frame</li>
+              <li>Press 'N' when ready to start the exam</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Online Exam</h1>
+          <div className="text-xl font-semibold">
+            Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+          </div>
+        </div>
 
-if (isInitialCheck) {
-return (
- <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-   <div className="p-8 bg-white rounded-lg shadow-lg max-w-md w-full text-center">
-     <h1 className="text-2xl font-bold mb-6">Environment Check</h1>
-     <div className="mb-6">
-       <div className="text-lg mb-4">{checkStatus}</div>
-       <div className="space-y-2">
-         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-           <span>Camera Connected:</span>
-           <span className="font-bold">✅</span>
-         </div>
-         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-           <span>Person Detected:</span>
-           <span className={`font-bold ${status.person_count === 1 ? "text-green-600" : "text-red-600"}`}>
-             {status.person_count === 1 && isNPressed ? "✅" : "❌"}
-           </span>
-         </div>
-         <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
-           <span>No Phone Detected:</span>
-           <span className={`font-bold ${!status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
-             {!status.cellphone_detected ? "✅" : "❌"}
-           </span>
-         </div>
-       </div>
-     </div>
-     <div className="text-sm text-gray-600">
-       Please ensure:
-       <ul className="list-disc text-left pl-5 mt-2">
-         <li>You are clearly visible in the camera</li>
-         <li>No phones or other devices are visible</li>
-         <li>You are in a well-lit environment</li>
-         <li>You are the only person visible in the frame</li>
-         <li>Press 'N' when ready to start the exam</li>
-       </ul>
-     </div>
-   </div>
- </div>
-);
-}
+        <div className="flex space-x-4 mb-6">
+          <button
+            onClick={() => handleSectionSwitch("mcq")}
+            className={`px-4 py-2 rounded-lg ${examSection === "mcq" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"}`}
+          >
+            Multiple Choice
+          </button>
+          <button
+            onClick={() => handleSectionSwitch("coding")}
+            className={`px-4 py-2 rounded-lg ${examSection === "coding" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"}`}
+          >
+            Coding Questions
+          </button>
+        </div>
 
-return (
-<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
- <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
-   <div className="flex justify-between items-center mb-6">
-     <h1 className="text-2xl font-bold">Online Exam</h1>
-     <div className="text-xl font-semibold">
-       Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
-     </div>
-   </div>
+        {examSection === "mcq" ? (
+          <div>
+            <div className="flex justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </h2>
+              <span className="text-gray-600">
+                {selectedAnswers[currentQuestionIndex] ? "Answered" : "Not answered"}
+              </span>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-lg mb-4">{questions[currentQuestionIndex]?.question}</p>
+              <div className="space-y-3">
+                {questions[currentQuestionIndex]?.options.map((option, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleAnswerSelect(option)}
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors
+                      ${selectedAnswers[currentQuestionIndex] === option ? "bg-blue-100 border-blue-500" : "hover:bg-gray-50"}`}
+                  >
+                    {option}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-   <div className="flex space-x-4 mb-6">
-     <button
-       onClick={() => handleSectionSwitch("mcq")}
-       className={`px-4 py-2 rounded-lg ${
-         examSection === "mcq"
-           ? "bg-blue-500 text-white"
-           : "bg-gray-200 hover:bg-gray-300"
-       }`}
-     >
-       Multiple Choice
-     </button>
-     <button
-       onClick={() => handleSectionSwitch("coding")}
-       className={`px-4 py-2 rounded-lg ${
-         examSection === "coding"
-           ? "bg-blue-500 text-white"
-           : "bg-gray-200 hover:bg-gray-300"
-       }`}
-     >
-       Coding Questions
-     </button>
-   </div>
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentQuestionIndex === 0}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                disabled={currentQuestionIndex === questions.length - 1}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="flex justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                Question {currentCodingIndex + 1} of {CODING_QUESTIONS.length}
+              </h2>
+            </div>
+            
+            <CodingSection
+              currentQuestion={CODING_QUESTIONS[currentCodingIndex]}
+              onSubmit={handleCodingSubmit}
+            />
 
-   {examSection === "mcq" ? (
-     <div>
-       <div className="flex justify-between mb-4">
-         <h2 className="text-lg font-semibold">
-           Question {currentQuestionIndex + 1} of {questions.length}
-         </h2>
-         <span className="text-gray-600">
-           {selectedAnswers[currentQuestionIndex] ? "Answered" : "Not answered"}
-         </span>
-       </div>
-       
-       <div className="mb-6">
-         <p className="text-lg mb-4">{questions[currentQuestionIndex]?.question}</p>
-         <div className="space-y-3">
-           {questions[currentQuestionIndex]?.options.map((option, index) => (
-             <div
-               key={index}
-               onClick={() => handleAnswerSelect(option)}
-               className={`p-3 rounded-lg border cursor-pointer transition-colors
-                 ${
-                   selectedAnswers[currentQuestionIndex] === option
-                     ? "bg-blue-100 border-blue-500"
-                     : "hover:bg-gray-50"
-                 }`}
-             >
-               {option}
-             </div>
-           ))}
-         </div>
-       </div>
+            <div className="flex justify-between mt-6">
+              <button
+                onClick={() => setCurrentCodingIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentCodingIndex === 0}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentCodingIndex(prev => Math.min(CODING_QUESTIONS.length - 1, prev + 1))}
+                disabled={currentCodingIndex === CODING_QUESTIONS.length - 1}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
 
-       <div className="flex justify-between items-center">
-         <button
-           onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-           disabled={currentQuestionIndex === 0}
-           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
-         >
-           Previous
-         </button>
-         <button
-           onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
-           disabled={currentQuestionIndex === questions.length - 1}
-           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
-         >
-           Next
-         </button>
-       </div>
-     </div>
-   ) : (
-     <div>
-       <div className="flex justify-between mb-4">
-         <h2 className="text-lg font-semibold">
-           Question {currentCodingIndex + 1} of {CODING_QUESTIONS.length}
-         </h2>
-       </div>
-       
-       <CodingSection
-         currentQuestion={CODING_QUESTIONS[currentCodingIndex]}
-         onSubmit={handleCodingSubmit}
-       />
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => handleExamEnd("Exam submitted by user")}
+            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
+          >
+            Submit Exam
+          </button>
+        </div>
+      </div>
 
-       <div className="flex justify-between mt-6">
-         <button
-           onClick={() => setCurrentCodingIndex(prev => Math.max(0, prev - 1))}
-           disabled={currentCodingIndex === 0}
-           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
-         >
-           Previous
-         </button>
-         <button
-           onClick={() => setCurrentCodingIndex(prev => Math.min(CODING_QUESTIONS.length - 1, prev + 1))}
-           disabled={currentCodingIndex === CODING_QUESTIONS.length - 1}
-           className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
-         >
-           Next
-         </button>
-       </div>
-     </div>
-   )}
-
-   <div className="mt-6 flex justify-center">
-     <button
-       onClick={() => handleExamEnd("Exam submitted by user")}
-       className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
-     >
-       Submit Exam
-     </button>
-   </div>
- </div>
-
- <div className="fixed top-4 right-4 w-80 space-y-2">
-   {alerts.map((alert) => (
-     <div
-       key={alert.id}
-       className={`p-4 rounded-lg shadow-lg ${
-         alert.type === "error"
-           ? "bg-red-500 text-white"
-           : alert.type === "warning"
-           ? "bg-yellow-100 text-yellow-800"
-           : "bg-green-100 text-green-800"
-       }`}
-     >
-       {alert.message}
-     </div>
-   ))}
- </div>
-</div>
-);
+      <div className="fixed top-4 right-4 w-80 space-y-2">
+        {alerts.map((alert) => (
+          <div
+            key={alert.id}
+            className={`p-4 rounded-lg shadow-lg ${
+              alert.type === "error" ? "bg-red-500 text-white" 
+                : alert.type === "warning" ? "bg-yellow-100 text-yellow-800" 
+                : "bg-green-100 text-green-800"
+            }`}
+          >
+            {alert.message}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Exam;
