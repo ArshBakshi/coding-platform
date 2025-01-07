@@ -7,11 +7,11 @@ export const AptitudeTopics = () => {
   const topics = [
     "Linux",
     "DevOps",
-    "Networking",
-    "Programming",
-    "Cloud",
+    "nodeJS",
+    "Django",
+    "VueJS",
     "Docker",
-    "Kubernetes",
+    "React",
   ];
 
   const handlePracticeClick = (topic) => {
