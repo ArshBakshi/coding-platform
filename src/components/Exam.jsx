@@ -5,144 +5,160 @@ const MOCK_QUESTIONS = [
   {
     question: "What is the capital of France?",
     options: ["London", "Berlin", "Paris", "Madrid"],
-    correct_answer: "Paris"
+    correct_answer: "Paris",
   },
   {
     question: "Which planet is known as the Red Planet?",
     options: ["Venus", "Mars", "Jupiter", "Saturn"],
-    correct_answer: "Mars"
+    correct_answer: "Mars",
   },
   {
     question: "What is 2 + 2?",
     options: ["3", "4", "5", "6"],
-    correct_answer: "4"
+    correct_answer: "4",
   },
   {
     question: "Who wrote 'Romeo and Juliet'?",
-    options: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
-    correct_answer: "William Shakespeare"
+    options: [
+      "Charles Dickens",
+      "William Shakespeare",
+      "Jane Austen",
+      "Mark Twain",
+    ],
+    correct_answer: "William Shakespeare",
   },
   {
     question: "What is the chemical symbol for gold?",
     options: ["Ag", "Fe", "Au", "Cu"],
-    correct_answer: "Au"
-  }
+    correct_answer: "Au",
+  },
 ];
+
 
 const CODING_QUESTIONS = [
   {
     id: 1,
     title: "Two Sum",
-    description: "Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.",
+    description:
+      "Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.",
     examples: [
       {
         input: "nums = [2,7,11,15], target = 9",
         output: "[0,1]",
-        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]"
-      }
+        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]",
+      },
     ],
     testCases: [
       {
         input: [2, 7, 11, 15],
         target: 9,
-        expected: [0, 1]
+        expected: [0, 1],
       },
       {
         input: [3, 2, 4],
         target: 6,
-        expected: [1, 2]
-      }
+        expected: [1, 2],
+      },
     ],
     defaultCode: {
       python: "def two_sum(nums, target):\n    # Your code here\n    pass",
       javascript: "function twoSum(nums, target) {\n    // Your code here\n}",
-      java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return new int[]{};\n    }\n}"
-    }
+      java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return new int[]{};\n    }\n}",
+    },
   },
   {
     id: 2,
     title: "Palindrome Check",
-    description: "Write a function that checks if a given string is a palindrome.",
+    description:
+      "Write a function that checks if a given string is a palindrome.",
     examples: [
       {
         input: "'racecar'",
         output: "true",
-        explanation: "It reads the same forwards and backwards"
-      }
+        explanation: "It reads the same forwards and backwards",
+      },
     ],
     testCases: [
       {
         input: "racecar",
-        expected: true
+        expected: true,
       },
       {
         input: "hello",
-        expected: false
-      }
+        expected: false,
+      },
     ],
     defaultCode: {
       python: "def is_palindrome(s):\n    # Your code here\n    pass",
       javascript: "function isPalindrome(s) {\n    // Your code here\n}",
-      java: "class Solution {\n    public boolean isPalindrome(String s) {\n        // Your code here\n        return false;\n    }\n}"
-    }
-  }
+      java: "class Solution {\n    public boolean isPalindrome(String s) {\n        // Your code here\n        return false;\n    }\n}",
+    },
+  },
 ];
 const executeCode = async (code, language, testCases) => {
   const runTestCase = (testCase, code, language) => {
     try {
       let result;
-      if (language === 'javascript') {
-        if (code.includes('twoSum')) {
-          const fn = new Function('nums', 'target', `
+      if (language === "javascript") {
+        if (code.includes("twoSum")) {
+          const fn = new Function(
+            "nums",
+            "target",
+            `
             ${code}
             return twoSum(nums, target);
-          `);
+          `
+          );
           result = fn(testCase.input, testCase.target);
-        } else if (code.includes('isPalindrome')) {
-          const fn = new Function('s', `
+        } else if (code.includes("isPalindrome")) {
+          const fn = new Function(
+            "s",
+            `
             ${code}
             return isPalindrome(s);
-          `);
+          `
+          );
           result = fn(testCase.input);
         }
 
         // Deep comparison for arrays and primitives
-        const passed = Array.isArray(result) ? 
-          JSON.stringify(result.sort()) === JSON.stringify(testCase.expected.sort()) :
-          result === testCase.expected;
+        const passed = Array.isArray(result)
+          ? JSON.stringify(result.sort()) ===
+            JSON.stringify(testCase.expected.sort())
+          : result === testCase.expected;
 
         return {
           passed,
           actual: result,
-          error: null
+          error: null,
         };
-      } else if (language === 'python' || language === 'java') {
+      } else if (language === "python" || language === "java") {
         // Mock execution for Python/Java - you'll need backend service
         return {
           passed: false,
           actual: null,
-          error: `${language} execution requires backend service integration`
+          error: `${language} execution requires backend service integration`,
         };
       }
     } catch (error) {
       return {
         passed: false,
         actual: null,
-        error: error.message
+        error: error.message,
       };
     }
   };
 
-  const results = testCases.map(testCase => ({
+  const results = testCases.map((testCase) => ({
     ...runTestCase(testCase, code, language),
     input: testCase.input,
     target: testCase.target,
-    expected: testCase.expected
+    expected: testCase.expected,
   }));
 
   return {
-    success: results.some(r => r.passed),
-    results
+    success: results.some((r) => r.passed),
+    results,
   };
 };
 
@@ -160,17 +176,21 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
 
   const handleRun = async () => {
     setIsRunning(true);
-    const executionResults = await executeCode(code, language, currentQuestion.testCases);
+    const executionResults = await executeCode(
+      code,
+      language,
+      currentQuestion.testCases
+    );
     setResults(executionResults.results);
-    const passed = executionResults.results.filter(r => r.passed).length;
+    const passed = executionResults.results.filter((r) => r.passed).length;
     setTestsPassed(passed);
     setIsRunning(false);
-    
+
     onSubmit({
       code,
       language,
       testsPassed: passed,
-      totalTests: currentQuestion.testCases.length
+      totalTests: currentQuestion.testCases.length,
     });
   };
   return (
@@ -178,7 +198,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-xl font-bold mb-2">{currentQuestion.title}</h3>
         <p className="mb-4">{currentQuestion.description}</p>
-        
+
         <div className="bg-white p-4 rounded-lg mb-4">
           <h4 className="font-semibold mb-2">Examples:</h4>
           {currentQuestion.examples.map((example, idx) => (
@@ -225,17 +245,33 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
           <h4 className="font-semibold mb-2">Test Results:</h4>
           <div className="space-y-2">
             {results.map((result, idx) => (
-              <div key={idx} className={`p-4 rounded-lg ${result.passed ? "bg-green-100" : "bg-red-100"}`}>
+              <div
+                key={idx}
+                className={`p-4 rounded-lg ${
+                  result.passed ? "bg-green-100" : "bg-red-100"
+                }`}
+              >
                 <div className="flex items-center">
-                  <span className={result.passed ? "text-green-600" : "text-red-600"}>
+                  <span
+                    className={
+                      result.passed ? "text-green-600" : "text-red-600"
+                    }
+                  >
                     {result.passed ? "✓" : "✗"}
                   </span>
                   <div className="ml-2">
                     <p>Input: {JSON.stringify(result.input)}</p>
-                    {result.target !== undefined && <p>Target: {JSON.stringify(result.target)}</p>}
+                    {result.target !== undefined && (
+                      <p>Target: {JSON.stringify(result.target)}</p>
+                    )}
                     <p>Expected: {JSON.stringify(result.expected)}</p>
                     {!result.passed && (
-                      <p>Actual: {result.error ? `Error: ${result.error}` : JSON.stringify(result.actual)}</p>
+                      <p>
+                        Actual:{" "}
+                        {result.error
+                          ? `Error: ${result.error}`
+                          : JSON.stringify(result.actual)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -259,7 +295,10 @@ const Exam = () => {
   const [isExamOver, setIsExamOver] = useState(false);
   const [isNPressed, setIsNPressed] = useState(false);
   const nKeyRef = useRef(false);
-  const [status, setStatus] = useState({ person_count: 0, cellphone_detected: false });
+  const [status, setStatus] = useState({
+    person_count: 0,
+    cellphone_detected: false,
+  });
   const [warnings, setWarnings] = useState({
     tabSwitch: 0,
     windowBlur: 0,
@@ -279,20 +318,36 @@ const Exam = () => {
   const [examSection, setExamSection] = useState("mcq");
   const [currentCodingIndex, setCurrentCodingIndex] = useState(0);
   const [codingAnswers, setCodingAnswers] = useState({});
+  const [data, setData] = useState([]);
   const [examResults, setExamResults] = useState({
     mcq: {},
-    coding: {}
+    coding: {},
   });
   useEffect(() => {
+    const fetchData = async () => {
+      const api_key = process.env.REACT_APP_Api_KEY;
+      const api = `https://quizapi.io/api/v1/questions?apiKey=${api_key}&limit=10`;
+      try {
+        const res = await fetch(api);
+        const data = await res.json();
+        setData(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     const handleKeyPress = (event) => {
-      if (event.key === 'n' || event.key === 'N') {
+      if (event.key === "n" || event.key === "N") {
         nKeyRef.current = true;
         setIsNPressed(true);
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, []);
 
   useEffect(() => {
@@ -382,7 +437,9 @@ const Exam = () => {
               addAlert("⚠️ Warning: Window unfocused!", "warning");
               captureViolationScreenshot();
             } else if (newCount >= 2) {
-              handleExamEnd("Test terminated due to multiple window unfocus events");
+              handleExamEnd(
+                "Test terminated due to multiple window unfocus events"
+              );
             }
             return { ...prev, windowBlur: newCount };
           });
@@ -409,7 +466,9 @@ const Exam = () => {
           addAlert("⚠️ Warning: No person detected!", "warning");
           captureViolationScreenshot();
         } else if (newCount >= 3) {
-          handleExamEnd("Test terminated: Extended period with no person detected");
+          handleExamEnd(
+            "Test terminated: Extended period with no person detected"
+          );
         }
         return { ...prev, noPerson: newCount };
       });
@@ -448,27 +507,31 @@ const Exam = () => {
     }
   };
   const checkEnvironment = () => {
-    console.log('Starting environment check');
+    console.log("Starting environment check");
 
     const checkInterval = setInterval(() => {
-      console.log('Checking environment...', { isNPressed: nKeyRef.current });
-      
+      console.log("Checking environment...", { isNPressed: nKeyRef.current });
+
       fetch("http://127.0.0.1:5000/status")
         .then((response) => response.json())
         .then((data) => {
           setStatus(data);
-          
+
           if (data.cellphone_detected) {
             setCheckStatus("⚠️ Please remove any phones from the camera view");
           } else if (data.person_count === 0) {
-            setCheckStatus("👤 Please position yourself in front of the camera");
+            setCheckStatus(
+              "👤 Please position yourself in front of the camera"
+            );
           } else if (data.person_count > 1) {
             setCheckStatus("⚠️ Only one person should be visible");
           } else if (data.person_count === 1 && !data.cellphone_detected) {
             if (!nKeyRef.current) {
               setCheckStatus("Press 'N' to start the exam...");
             } else {
-              setCheckStatus("✅ Environment check passed! Starting exam in 3 seconds...");
+              setCheckStatus(
+                "✅ Environment check passed! Starting exam in 3 seconds..."
+              );
               clearInterval(checkInterval);
               setTimeout(() => {
                 setIsInitialCheck(false);
@@ -489,7 +552,9 @@ const Exam = () => {
   const captureViolationScreenshot = () => {
     fetch("http://127.0.0.1:5000/screenshot")
       .then((response) => response.json())
-      .then((data) => console.log("Violation screenshot captured:", data.filename))
+      .then((data) =>
+        console.log("Violation screenshot captured:", data.filename)
+      )
       .catch((error) => console.error("Error capturing screenshot:", error));
   };
 
@@ -509,9 +574,9 @@ const Exam = () => {
       [currentQuestionIndex]: answer,
     };
     setSelectedAnswers(newAnswers);
-    setExamResults(prev => ({
+    setExamResults((prev) => ({
       ...prev,
-      mcq: newAnswers
+      mcq: newAnswers,
     }));
   };
 
@@ -522,25 +587,25 @@ const Exam = () => {
   const handleCodingSubmit = (codingResult) => {
     const newCodingAnswers = {
       ...codingAnswers,
-      [currentCodingIndex]: codingResult
+      [currentCodingIndex]: codingResult,
     };
     setCodingAnswers(newCodingAnswers);
-    setExamResults(prev => ({
+    setExamResults((prev) => ({
       ...prev,
-      coding: newCodingAnswers
+      coding: newCodingAnswers,
     }));
   };
   const handleExamEnd = (reason) => {
     setIsExamOver(true);
     stopProctoring();
-    
+
     const finalResults = {
       mcq: {
         answers: selectedAnswers,
         score: Object.entries(selectedAnswers).reduce((acc, [idx, answer]) => {
           return acc + (answer === MOCK_QUESTIONS[idx].correct_answer ? 1 : 0);
         }, 0),
-        total: MOCK_QUESTIONS.length
+        total: MOCK_QUESTIONS.length,
       },
       coding: {
         answers: codingAnswers,
@@ -549,8 +614,8 @@ const Exam = () => {
         }, 0),
         total: Object.values(codingAnswers).reduce((acc, result) => {
           return acc + (result.totalTests || 0);
-        }, 0)
-      }
+        }, 0),
+      },
     };
 
     sessionStorage.setItem("examResults", JSON.stringify(finalResults));
@@ -572,13 +637,25 @@ const Exam = () => {
               </div>
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span>Person Detected:</span>
-                <span className={`font-bold ${status.person_count === 1 ? "text-green-600" : "text-red-600"}`}>
+                <span
+                  className={`font-bold ${
+                    status.person_count === 1
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {status.person_count === 1 && isNPressed ? "✅" : "❌"}
                 </span>
               </div>
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span>No Phone Detected:</span>
-                <span className={`font-bold ${!status.cellphone_detected ? "text-green-600" : "text-red-600"}`}>
+                <span
+                  className={`font-bold ${
+                    !status.cellphone_detected
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {!status.cellphone_detected ? "✅" : "❌"}
                 </span>
               </div>
@@ -604,20 +681,29 @@ const Exam = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Online Exam</h1>
           <div className="text-xl font-semibold">
-            Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, "0")}
+            Time Left: {Math.floor(timeLeft / 60)}:
+            {String(timeLeft % 60).padStart(2, "0")}
           </div>
         </div>
 
         <div className="flex space-x-4 mb-6">
           <button
             onClick={() => handleSectionSwitch("mcq")}
-            className={`px-4 py-2 rounded-lg ${examSection === "mcq" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"}`}
+            className={`px-4 py-2 rounded-lg ${
+              examSection === "mcq"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
           >
             Multiple Choice
           </button>
           <button
             onClick={() => handleSectionSwitch("coding")}
-            className={`px-4 py-2 rounded-lg ${examSection === "coding" ? "bg-blue-500 text-white" : "bg-gray-200 hover:bg-gray-300"}`}
+            className={`px-4 py-2 rounded-lg ${
+              examSection === "coding"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
           >
             Coding Questions
           </button>
@@ -627,39 +713,55 @@ const Exam = () => {
           <div>
             <div className="flex justify-between mb-4">
               <h2 className="text-lg font-semibold">
-                Question {currentQuestionIndex + 1} of {questions.length}
+                Question {currentQuestionIndex + 1} of {data.length}
               </h2>
               <span className="text-gray-600">
-                {selectedAnswers[currentQuestionIndex] ? "Answered" : "Not answered"}
+                {selectedAnswers[currentQuestionIndex]
+                  ? "Answered"
+                  : "Not answered"}
               </span>
             </div>
-            
+
             <div className="mb-6">
-              <p className="text-lg mb-4">{questions[currentQuestionIndex]?.question}</p>
+              <p className="text-lg mb-4">
+                {data[currentQuestionIndex]?.question}
+              </p>
               <div className="space-y-3">
-                {questions[currentQuestionIndex]?.options.map((option, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleAnswerSelect(option)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors
-                      ${selectedAnswers[currentQuestionIndex] === option ? "bg-blue-100 border-blue-500" : "hover:bg-gray-50"}`}
-                  >
-                    {option}
-                  </div>
-                ))}
+                {Object.entries(data[currentQuestionIndex].answers).filter(([key, value]) => value !== null).map(
+                  ([key,value], index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleAnswerSelect(value)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors
+                      ${
+                        selectedAnswers[currentQuestionIndex] === value
+                          ? "bg-blue-100 border-blue-500"
+                          : "hover:bg-gray-50"
+                      }`}
+                    >
+                      {value}
+                    </div>
+                  )
+                )}
               </div>
             </div>
 
             <div className="flex justify-between items-center">
               <button
-                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                onClick={() =>
+                  setCurrentQuestionIndex((prev) => Math.max(0, prev - 1))
+                }
                 disabled={currentQuestionIndex === 0}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
               >
                 Previous
               </button>
               <button
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                onClick={() =>
+                  setCurrentQuestionIndex((prev) =>
+                    Math.min(questions.length - 1, prev + 1)
+                  )
+                }
                 disabled={currentQuestionIndex === questions.length - 1}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
               >
@@ -674,7 +776,7 @@ const Exam = () => {
                 Question {currentCodingIndex + 1} of {CODING_QUESTIONS.length}
               </h2>
             </div>
-            
+
             <CodingSection
               currentQuestion={CODING_QUESTIONS[currentCodingIndex]}
               onSubmit={handleCodingSubmit}
@@ -682,14 +784,20 @@ const Exam = () => {
 
             <div className="flex justify-between mt-6">
               <button
-                onClick={() => setCurrentCodingIndex(prev => Math.max(0, prev - 1))}
+                onClick={() =>
+                  setCurrentCodingIndex((prev) => Math.max(0, prev - 1))
+                }
                 disabled={currentCodingIndex === 0}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
               >
                 Previous
               </button>
               <button
-                onClick={() => setCurrentCodingIndex(prev => Math.min(CODING_QUESTIONS.length - 1, prev + 1))}
+                onClick={() =>
+                  setCurrentCodingIndex((prev) =>
+                    Math.min(CODING_QUESTIONS.length - 1, prev + 1)
+                  )
+                }
                 disabled={currentCodingIndex === CODING_QUESTIONS.length - 1}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
               >
@@ -714,8 +822,10 @@ const Exam = () => {
           <div
             key={alert.id}
             className={`p-4 rounded-lg shadow-lg ${
-              alert.type === "error" ? "bg-red-500 text-white" 
-                : alert.type === "warning" ? "bg-yellow-100 text-yellow-800" 
+              alert.type === "error"
+                ? "bg-red-500 text-white"
+                : alert.type === "warning"
+                ? "bg-yellow-100 text-yellow-800"
                 : "bg-green-100 text-green-800"
             }`}
           >
