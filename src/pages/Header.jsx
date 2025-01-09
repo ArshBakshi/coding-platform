@@ -57,6 +57,20 @@ const Header = () => {
                   Test
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="http://172.16.13.42:3001"
+                  className={({ isActive }) =>
+                    `text-sm font-medium transition duration-300 ${
+                      isActive
+                        ? "text-blue-400 border-b-2 border-blue-400 pb-2"
+                        : "text-gray-300 hover:text-blue-400"
+                    }`
+                  }
+                >
+                  Interview
+                </NavLink>
+              </li>
             </ul>
           </nav>
         </div>
