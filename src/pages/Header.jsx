@@ -10,7 +10,7 @@ const Header = () => {
             to="/"
             className="text-white text-xl font-bold hover:text-blue-400 transition duration-300"
           >
-            My Quiz App
+            GMP
           </NavLink>
 
           <nav>
