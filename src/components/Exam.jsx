@@ -243,6 +243,13 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [testsPassed, setTestsPassed] = useState(0);
 
+  // Add useEffect to update code when question changes
+  useEffect(() => {
+    setCode(currentQuestion.defaultCode[language]);
+    setResults(null); // Reset results when question changes
+    setTestsPassed(0);
+  }, [currentQuestion, language]);
+
   const handleLanguageChange = (newLanguage) => {
     setLanguage(newLanguage);
     setCode(currentQuestion.defaultCode[newLanguage]);
@@ -262,6 +269,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
     setIsRunning(false);
 
     onSubmit({
+      questionId: currentQuestion.id, // Add question ID to track which question this is
       code,
       language,
       testsPassed: passed,
@@ -660,6 +668,7 @@ const Exam = () => {
     setIsExamOver(true);
     stopProctoring();
   
+    // Calculate MCQ scores
     const mcqScore = Object.entries(selectedAnswers).reduce(
       (acc, [idx, answer]) => {
         const correctAnswers = data[idx].correct_answers;
@@ -675,30 +684,65 @@ const Exam = () => {
       0
     );
   
-  const finalResults={
-    mcq: {
-      answers: selectedAnswers,
-      score: mcqScore,
-      total: data.length,
-    },
-    coding: {
-      answers: codingAnswers,
-      score: Object.values(codingAnswers).reduce((acc, result) => {
-        return acc + (result.testsPassed || 0);
-      }, 0),
-      total: Object.values(codingAnswers).reduce((acc, result) => {
-        return acc + (result.totalTests || 0);
-      }, 0),
-    },
+    // Format MCQ answers with questions
+    const formattedMcqAnswers = Object.entries(selectedAnswers).map(([idx, answer]) => ({
+      questionIndex: parseInt(idx),
+      question: data[idx].question,
+      selectedAnswer: answer,
+      correctAnswer: data[idx].answers[
+        Object.entries(data[idx].correct_answers)
+          .find(([key, value]) => value === "true")[0]
+          .replace("_correct", "")
+      ],
+      isCorrect: data[idx].answers[
+        Object.entries(data[idx].correct_answers)
+          .find(([key, value]) => value === "true")[0]
+          .replace("_correct", "")
+      ] === answer
+    }));
+  
+    // Format coding answers with all attempted and unattempted questions
+    const formattedCodingAnswers = CODING_QUESTIONS.reduce((acc, question) => {
+      const answer = codingAnswers[question.id - 1] || {
+        code: question.defaultCode.python,
+        language: 'python',
+        testsPassed: 0,
+        totalTests: question.testCases.length,
+        optimization: { optimal: false, reason: "Question not attempted" }
+      };
+  
+      acc[question.id - 1] = {
+        ...answer,
+        questionId: question.id,
+        title: question.title,
+        description: question.description,
+        attempted: !!codingAnswers[question.id - 1]
+      };
+      return acc;
+    }, {});
+  
+    const finalResults = {
+      mcq: {
+        answers: formattedMcqAnswers,
+        score: mcqScore,
+        total: data.length,
+      },
+      coding: {
+        answers: formattedCodingAnswers,
+        score: Object.values(codingAnswers).reduce((acc, result) => {
+          return acc + (result.testsPassed || 0);
+        }, 0),
+        total: CODING_QUESTIONS.reduce((acc, _) => acc + 2, 0), // 2 test cases per question
+      },
+    };
+  
+    // Store results and questions
+    sessionStorage.setItem("examResults", JSON.stringify(finalResults));
+    sessionStorage.setItem("examEndReason", reason);
+    sessionStorage.setItem("codingQuestions", JSON.stringify(CODING_QUESTIONS));
+  
+    navigate("/result");
   };
-
-  sessionStorage.setItem("examResults", JSON.stringify(finalResults));
-  sessionStorage.setItem("examEndReason", reason);
-  sessionStorage.setItem("codingQuestions", JSON.stringify(CODING_QUESTIONS));
-
-  navigate("/result");
-};
-
   if (isInitialCheck) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
