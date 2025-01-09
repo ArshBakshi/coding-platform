@@ -46,7 +46,7 @@ const OptimalSolutionDisplay = ({ question, submittedCode, language }) => {
           </div>
         </div>
 
-        {/* Comparison */}
+        {/* Your Implementation */}
         <div>
           <h5 className="font-medium text-gray-800 mb-2">
             Your Implementation:
@@ -298,27 +298,40 @@ const Results = () => {
                     }
                   )}
               </div>
-            </div>
 
-            {/* Navigation Buttons */}
-            <div className="mt-8 flex justify-center space-x-4">
-              <button
-                onClick={() => navigate("/")}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Return to Home
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Print Results
-              </button>
-              <div>
-                <h5>Feeling confident? Take an interview!</h5>
-                <NavLink to="http://localhost:3001/resupload">
-                  <button>Interview</button>
-                </NavLink>
+              {/* Navigation and Next Steps Section */}
+              <div className="mt-12 space-y-8">
+                {/* Action Buttons */}
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Return to Home
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    Print Results
+                  </button>
+                </div>
+
+                {/* Interview Section */}
+                <div className="text-center p-8 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl shadow-sm">
+                  <h5 className="text-xl font-semibold text-gray-800 mb-3">
+                    Ready to Take the Next Step?
+                  </h5>
+                  <p className="text-gray-600 mb-6">
+                    Feeling confident? Put your skills to the test in a mock interview!
+                  </p>
+                  <NavLink 
+                    to="http://localhost:3001/resupload"
+                    className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                  >
+                    Start Mock Interview
+                  </NavLink>
+                </div>
               </div>
             </div>
           </div>
