@@ -39,9 +39,9 @@ const Results = () => {
 
   const getGrade = (percentage) => {
     if (percentage >= 90) return { grade: "A", color: "text-green-600" };
-    if (percentage >= 80) return { grade: "B", color: "text-blue-600" };
-    if (percentage >= 70) return { grade: "C", color: "text-yellow-600" };
-    if (percentage >= 60) return { grade: "D", color: "text-orange-600" };
+    if (percentage >= 70) return { grade: "B", color: "text-blue-600" };
+    if (percentage >= 50) return { grade: "C", color: "text-yellow-600" };
+    if (percentage >= 30) return { grade: "D", color: "text-orange-600" };
     return { grade: "F", color: "text-red-600" };
   };
 
