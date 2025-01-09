@@ -5,8 +5,7 @@ const CODING_QUESTIONS = [
   {
     id: 1,
     title: "Two Sum",
-    description:
-      "Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.",
+    description: "Given an array of integers nums and an integer target, return indices of the two numbers in nums such that they add up to target.",
     examples: [
       {
         input: "nums = [2,7,11,15], target = 9",
@@ -31,12 +30,51 @@ const CODING_QUESTIONS = [
       javascript: "function twoSum(nums, target) {\n    // Your code here\n}",
       java: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return new int[]{};\n    }\n}",
     },
+    optimalSolution: {
+      javascript: `function twoSum(nums, target) {
+    const map = new Map();
+    
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        if (map.has(complement)) {
+            return [map.get(complement), i];
+        }
+        map.set(nums[i], i);
+    }
+    return [];
+}`,
+      python: `def two_sum(nums, target):
+    num_map = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in num_map:
+            return [num_map[complement], i]
+        num_map[num] = i
+    return []`,
+      java: `class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[] { map.get(complement), i };
+            }
+            map.put(nums[i], i);
+        }
+        return new int[]{};
+    }
+}`
+    },
+    complexity: {
+      time: "O(n)",
+      space: "O(n)",
+      explanation: "Uses a hash map to store previously seen numbers, allowing for O(1) lookups. One pass through the array gives us O(n) time complexity."
+    }
   },
   {
     id: 2,
     title: "Palindrome Check",
-    description:
-      "Write a function that checks if a given string is a palindrome.",
+    description: "Write a function that checks if a given string is a palindrome.",
     examples: [
       {
         input: "'racecar'",
@@ -59,10 +97,79 @@ const CODING_QUESTIONS = [
       javascript: "function isPalindrome(s) {\n    // Your code here\n}",
       java: "class Solution {\n    public boolean isPalindrome(String s) {\n        // Your code here\n        return false;\n    }\n}",
     },
-  },
+    optimalSolution: {
+      javascript: `function isPalindrome(s) {
+    let left = 0, right = s.length - 1;
+    
+    while (left < right) {
+        if (s[left] !== s[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    return true;
+}`,
+      python: `def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    
+    while left < right:
+        if s[left] != s[right]:
+            return False
+        left += 1
+        right -= 1
+    return True`,
+      java: `class Solution {
+    public boolean isPalindrome(String s) {
+        int left = 0, right = s.length() - 1;
+        
+        while (left < right) {
+            if (s.charAt(left) != s.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+}`
+    },
+    complexity: {
+      time: "O(n/2) ≈ O(n)",
+      space: "O(1)",
+      explanation: "Uses two pointers to check characters from both ends, meeting in the middle. Only requires constant extra space."
+    }
+  }
 ];
+const analyzeSolution = (code, question) => {
+  const isOptimal = {
+    optimal: false,
+    reason: ""
+  };
 
-const executeCode = async (code, language, testCases) => {
+  if (question.title === "Two Sum") {
+    if (code.includes("Map()") || code.includes("{}")) {
+      const hasOneLoop = (code.match(/for\s*\(/g) || []).length === 1;
+      if (hasOneLoop) {
+        isOptimal.optimal = true;
+      } else {
+        isOptimal.reason = "Solution should use a single pass through the array with a hash map for O(n) time complexity";
+      }
+    } else {
+      isOptimal.reason = "Solution should use a hash map/object to achieve optimal time complexity";
+    }
+  } else if (question.title === "Palindrome Check") {
+    if (code.includes("while") && code.includes("left") && code.includes("right")) {
+      isOptimal.optimal = true;
+    } else {
+      isOptimal.reason = "Solution should use two pointers approach for optimal space and time complexity";
+    }
+  }
+
+  return isOptimal;
+};
+
+const executeCode = async (code, language, testCases, currentQuestion) => {
   const runTestCase = (testCase, code, language) => {
     try {
       let result;
@@ -89,8 +196,7 @@ const executeCode = async (code, language, testCases) => {
         }
 
         const passed = Array.isArray(result)
-          ? JSON.stringify(result.sort()) ===
-            JSON.stringify(testCase.expected.sort())
+          ? JSON.stringify(result.sort()) === JSON.stringify(testCase.expected.sort())
           : result === testCase.expected;
 
         return {
@@ -121,9 +227,12 @@ const executeCode = async (code, language, testCases) => {
     expected: testCase.expected,
   }));
 
+  const optimizationAnalysis = analyzeSolution(code, currentQuestion);
+
   return {
     success: results.some((r) => r.passed),
     results,
+    optimization: optimizationAnalysis
   };
 };
 
@@ -144,7 +253,8 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
     const executionResults = await executeCode(
       code,
       language,
-      currentQuestion.testCases
+      currentQuestion.testCases,
+      currentQuestion
     );
     setResults(executionResults.results);
     const passed = executionResults.results.filter((r) => r.passed).length;
@@ -156,6 +266,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
       language,
       testsPassed: passed,
       totalTests: currentQuestion.testCases.length,
+      optimization: executionResults.optimization
     });
   };
 
@@ -218,11 +329,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
                 }`}
               >
                 <div className="flex items-center">
-                  <span
-                    className={
-                      result.passed ? "text-green-600" : "text-red-600"
-                    }
-                  >
+                  <span className={result.passed ? "text-green-600" : "text-red-600"}>
                     {result.passed ? "✓" : "✗"}
                   </span>
                   <div className="ml-2">
@@ -552,12 +659,10 @@ const Exam = () => {
   const handleExamEnd = (reason) => {
     setIsExamOver(true);
     stopProctoring();
-
-    // Calculate MCQ score based on API data
+  
     const mcqScore = Object.entries(selectedAnswers).reduce(
       (acc, [idx, answer]) => {
         const correctAnswers = data[idx].correct_answers;
-        // Find which answer is marked as correct in the API response
         const correctAnswer = Object.entries(correctAnswers).find(
           ([key, value]) => value === "true"
         );
@@ -569,31 +674,30 @@ const Exam = () => {
       },
       0
     );
-
-    const finalResults = {
-      mcq: {
-        answers: selectedAnswers,
-        score: mcqScore,
-        total: data.length,
-      },
-      coding: {
-        answers: codingAnswers,
-        score: Object.values(codingAnswers).reduce((acc, result) => {
-          return acc + (result.testsPassed || 0);
-        }, 0),
-        total: Object.values(codingAnswers).reduce((acc, result) => {
-          return acc + (result.totalTests || 0);
-        }, 0),
-      },
-    };
-
-    // Store results in sessionStorage
-    sessionStorage.setItem("examResults", JSON.stringify(finalResults));
-    sessionStorage.setItem("examEndReason", reason);
-
-    // Navigate to results page
-    navigate("/result");
+  
+  const finalResults={
+    mcq: {
+      answers: selectedAnswers,
+      score: mcqScore,
+      total: data.length,
+    },
+    coding: {
+      answers: codingAnswers,
+      score: Object.values(codingAnswers).reduce((acc, result) => {
+        return acc + (result.testsPassed || 0);
+      }, 0),
+      total: Object.values(codingAnswers).reduce((acc, result) => {
+        return acc + (result.totalTests || 0);
+      }, 0),
+    },
   };
+
+  sessionStorage.setItem("examResults", JSON.stringify(finalResults));
+  sessionStorage.setItem("examEndReason", reason);
+  sessionStorage.setItem("codingQuestions", JSON.stringify(CODING_QUESTIONS));
+
+  navigate("/result");
+};
 
   if (isInitialCheck) {
     return (
