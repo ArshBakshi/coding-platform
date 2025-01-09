@@ -306,12 +306,16 @@ const Exam = () => {
       if (event.key === "n" || event.key === "N") {
         nKeyRef.current = true;
         setIsNPressed(true);
+      } else if (event.key === "k" || (event.key === "K" && !isInitialCheck)) {
+        stopProctoring();
+        handleExamEnd("Test terminated: Unauthorized person detected");
+        addAlert("🛑 Exam terminated due to unauthorized person", "error");
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, []);
+  }, [isInitialCheck]);
 
   useEffect(() => {
     if (isInitialCheck) {
