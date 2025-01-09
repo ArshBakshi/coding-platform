@@ -11,6 +11,7 @@ import { AptitudeQuiz } from "./pages/AptitudeQuiz";
 import { AptitudeTopics } from "./pages/AptitudeTopics";
 import Response from "./components/Response";
 import Results from "./components/Results";
+import Landing from "./components/Landing";
 
 function App() {
   const router = createBrowserRouter([
@@ -18,6 +19,10 @@ function App() {
       path: "/",
       element: <AppLayout />,
       children: [
+        {
+          path: "/",
+          element: <Landing />,
+        },
         {
           path: "/aptitude",
           element: <AptitudeTopics />,
