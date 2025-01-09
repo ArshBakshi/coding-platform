@@ -9,6 +9,7 @@ import { Test } from "./pages/Test";
 import Exam from "./components/Exam";
 import { AptitudeQuiz } from "./pages/AptitudeQuiz";
 import { AptitudeTopics } from "./pages/AptitudeTopics";
+import Response from "./components/Response";
 
 function App() {
   const router = createBrowserRouter([
@@ -37,8 +38,6 @@ function App() {
           path: "/coding",
           element: <MainPage />,
         },
-        
-        
       ],
     },
     {
@@ -48,6 +47,10 @@ function App() {
     {
       path: "/exam",
       element: <Exam />,
+    },
+    {
+      path: "/response",
+      element: <Response />,
     },
   ]);
   return <RouterProvider router={router} />;
