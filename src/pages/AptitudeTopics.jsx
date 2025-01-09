@@ -8,49 +8,49 @@ export const AptitudeTopics = () => {
   const topics = [
     {
       name: "Linux",
-      icon: <Terminal className="w-8 h-8 mb-3" />,
+      icon: <Terminal className="w-8 h-8" />,
       description: "Master Linux commands and system administration concepts",
       count: "50+ questions",
       difficulty: "Intermediate",
     },
     {
       name: "DevOps",
-      icon: <Server className="w-8 h-8 mb-3" />,
+      icon: <Server className="w-8 h-8" />,
       description: "Learn CI/CD, automation, and cloud infrastructure",
       count: "40+ questions",
       difficulty: "Advanced",
     },
     {
       name: "nodeJS",
-      icon: <Globe className="w-8 h-8 mb-3" />,
+      icon: <Globe className="w-8 h-8" />,
       description: "Practice Node.js backend development concepts",
       count: "45+ questions",
       difficulty: "Intermediate",
     },
     {
       name: "Django",
-      icon: <Code className="w-8 h-8 mb-3" />,
+      icon: <Code className="w-8 h-8" />,
       description: "Test your Python web framework knowledge",
       count: "35+ questions",
       difficulty: "Advanced",
     },
     {
       name: "VueJS",
-      icon: <Box className="w-8 h-8 mb-3" />,
+      icon: <Box className="w-8 h-8" />,
       description: "Frontend development with Vue.js framework",
       count: "30+ questions",
       difficulty: "Intermediate",
     },
     {
       name: "Docker",
-      icon: <Container className="w-8 h-8 mb-3" />,
+      icon: <Container className="w-8 h-8" />,
       description: "Container technology and orchestration",
       count: "40+ questions",
       difficulty: "Advanced",
     },
     {
       name: "React",
-      icon: <Code className="w-8 h-8 mb-3" />,
+      icon: <Code className="w-8 h-8" />,
       description: "Master React components and state management",
       count: "55+ questions",
       difficulty: "Intermediate",
@@ -62,13 +62,13 @@ export const AptitudeTopics = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--Neutral-5)] py-16 px-4 sm:px-6 lg:px-8 font-['Space_Mono']">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-[var(--accent-blue-headers)] mb-6 space-mono-bold">
             Technical Aptitude Topics
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <p className="text-xl text-[var(--Neutral-80)] max-w-2xl mx-auto">
             Choose a topic to practice questions and improve your technical
             skills
           </p>
@@ -78,18 +78,22 @@ export const AptitudeTopics = () => {
           {topics.map((topic, index) => (
             <div
               key={index}
-              className="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-gray-700"
+              className="bg-[var(--Neutral-10)] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-[var(--Neutral-30)] hover:border-[var(--Blue-500)] group"
             >
               <div className="p-8">
-                <div className="flex flex-col items-center text-center mb-4">
-                  <div className="text-blue-400">{topic.icon}</div>
-                  <h2 className="text-2xl font-bold text-white mb-2">
+                <div className="flex flex-col items-center text-center mb-6">
+                  <div className="text-[var(--Blue-500)] group-hover:scale-110 transition-transform duration-300">
+                    {topic.icon}
+                  </div>
+                  <h2 className="text-2xl font-bold text-[var(--Neutral-90)] mt-4 mb-3">
                     {topic.name}
                   </h2>
-                  <p className="text-gray-400 mb-4">{topic.description}</p>
+                  <p className="text-[var(--Neutral-60)] mb-4">
+                    {topic.description}
+                  </p>
                 </div>
 
-                <div className="flex justify-between items-center mb-6 text-sm text-gray-400">
+                <div className="flex justify-between items-center mb-6 text-sm text-[var(--Neutral-50)]">
                   <span className="flex items-center">
                     <svg
                       className="w-4 h-4 mr-1"
@@ -126,11 +130,11 @@ export const AptitudeTopics = () => {
 
                 <button
                   onClick={() => handlePracticeClick(topic.name)}
-                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center"
+                  className="w-full bg-[var(--Blue-800)] text-[var(--Neutral-90)] py-3 px-4 rounded-lg hover:bg-[var(--Blue-500)] transition-colors duration-300 flex items-center justify-center group-hover:bg-[var(--Blue-500)]"
                 >
                   <span>Start Practice</span>
                   <svg
-                    className="w-5 h-5 ml-2"
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
