@@ -115,7 +115,8 @@ const Landing = () => {
                 Interview Game
               </h1>
               <p className="text-xl md:text-2xl text-[var(--gray-300)] mb-12 max-w-3xl mx-auto space-mono-regular">
-                Transform your interview preparation with advanced AI technology
+                One Platform. Endless Possibilities. Be Job-Ready Anytime,
+                Anywhere.
               </p>
               <div className="flex gap-6 justify-center">
                 <motion.button

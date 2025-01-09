@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 // Separate component for displaying optimal solutions
 const OptimalSolutionDisplay = ({ question, submittedCode, language }) => {
@@ -8,20 +8,26 @@ const OptimalSolutionDisplay = ({ question, submittedCode, language }) => {
       <h4 className="text-xl font-semibold mb-4 text-blue-700">
         Optimal Solution Reference
       </h4>
-      
+
       <div className="space-y-6">
         {/* Complexity Analysis */}
         <div className="mb-4">
-          <h5 className="font-medium text-gray-800 mb-2">Complexity Analysis:</h5>
+          <h5 className="font-medium text-gray-800 mb-2">
+            Complexity Analysis:
+          </h5>
           <div className="bg-white p-4 rounded-lg">
             <div className="grid grid-cols-2 gap-4 mb-3">
               <div>
                 <span className="text-gray-600">Time Complexity:</span>
-                <span className="ml-2 font-mono font-medium">{question.complexity.time}</span>
+                <span className="ml-2 font-mono font-medium">
+                  {question.complexity.time}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">Space Complexity:</span>
-                <span className="ml-2 font-mono font-medium">{question.complexity.space}</span>
+                <span className="ml-2 font-mono font-medium">
+                  {question.complexity.space}
+                </span>
               </div>
             </div>
             <p className="text-gray-700">{question.complexity.explanation}</p>
@@ -30,7 +36,9 @@ const OptimalSolutionDisplay = ({ question, submittedCode, language }) => {
 
         {/* Optimal Implementation */}
         <div>
-          <h5 className="font-medium text-gray-800 mb-2">Optimal Implementation:</h5>
+          <h5 className="font-medium text-gray-800 mb-2">
+            Optimal Implementation:
+          </h5>
           <div className="bg-gray-800 rounded-lg p-4 overflow-x-auto">
             <pre className="text-white">
               <code>{question.optimalSolution[language]}</code>
@@ -40,7 +48,9 @@ const OptimalSolutionDisplay = ({ question, submittedCode, language }) => {
 
         {/* Comparison */}
         <div>
-          <h5 className="font-medium text-gray-800 mb-2">Your Implementation:</h5>
+          <h5 className="font-medium text-gray-800 mb-2">
+            Your Implementation:
+          </h5>
           <div className="bg-gray-800 rounded-lg p-4 overflow-x-auto">
             <pre className="text-white">
               <code>{submittedCode}</code>
@@ -58,7 +68,7 @@ const PerformanceBadge = ({ performance }) => {
     excellent: "bg-green-100 text-green-800 border-green-200",
     good: "bg-blue-100 text-blue-800 border-blue-200",
     fair: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    poor: "bg-red-100 text-red-800 border-red-200"
+    poor: "bg-red-100 text-red-800 border-red-200",
   };
 
   const getPerformanceLevel = (score) => {
@@ -71,7 +81,9 @@ const PerformanceBadge = ({ performance }) => {
   const { level, text } = getPerformanceLevel(performance);
 
   return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium border ${badges[level]}`}>
+    <span
+      className={`px-3 py-1 rounded-full text-sm font-medium border ${badges[level]}`}
+    >
       {text}
     </span>
   );
@@ -94,7 +106,7 @@ const Results = () => {
 
     setResults({
       ...JSON.parse(savedResults),
-      questions: JSON.parse(savedQuestions)
+      questions: JSON.parse(savedQuestions),
     });
     setReason(savedReason || "Exam completed");
   }, [navigate]);
@@ -102,7 +114,9 @@ const Results = () => {
   if (!results) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl font-semibold text-gray-600">Loading results...</div>
+        <div className="text-xl font-semibold text-gray-600">
+          Loading results...
+        </div>
       </div>
     );
   }
@@ -150,8 +164,14 @@ const Results = () => {
             <div className="space-y-8">
               {/* Overall Score */}
               <div className="text-center p-6 bg-gray-50 rounded-lg">
-                <h2 className="text-2xl font-semibold mb-4">Overall Performance</h2>
-                <div className={`text-4xl font-bold mb-2 ${getGrade(calculateTotalPercentage()).color}`}>
+                <h2 className="text-2xl font-semibold mb-4">
+                  Overall Performance
+                </h2>
+                <div
+                  className={`text-4xl font-bold mb-2 ${
+                    getGrade(calculateTotalPercentage()).color
+                  }`}
+                >
                   {calculateTotalPercentage()}%
                 </div>
                 <div className="text-xl mb-4">
@@ -175,8 +195,14 @@ const Results = () => {
                       </div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded">
-                      <div className="text-sm text-gray-600 mb-1">Percentage</div>
-                      <div className={`text-2xl font-bold ${getGrade(calculateMCQPercentage()).color}`}>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Percentage
+                      </div>
+                      <div
+                        className={`text-2xl font-bold ${
+                          getGrade(calculateMCQPercentage()).color
+                        }`}
+                      >
                         {calculateMCQPercentage()}%
                       </div>
                     </div>
@@ -190,14 +216,22 @@ const Results = () => {
                   </h3>
                   <div className="space-y-4">
                     <div className="text-center p-4 bg-gray-50 rounded">
-                      <div className="text-sm text-gray-600 mb-1">Test Cases Passed</div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Test Cases Passed
+                      </div>
                       <div className="text-2xl font-bold">
                         {results.coding.score}/{results.coding.total}
                       </div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded">
-                      <div className="text-sm text-gray-600 mb-1">Percentage</div>
-                      <div className={`text-2xl font-bold ${getGrade(calculateCodingPercentage()).color}`}>
+                      <div className="text-sm text-gray-600 mb-1">
+                        Percentage
+                      </div>
+                      <div
+                        className={`text-2xl font-bold ${
+                          getGrade(calculateCodingPercentage()).color
+                        }`}
+                      >
                         {calculateCodingPercentage()}%
                       </div>
                     </div>
@@ -207,48 +241,62 @@ const Results = () => {
 
               {/* Coding Solutions Review */}
               <div className="border-t pt-8">
-                <h3 className="text-2xl font-semibold mb-6">Code Review & Optimization</h3>
-                
-                {results?.coding?.answers && Object.entries(results.coding.answers).map(([index, submission]) => {
-                  const question = results.questions[index];
-                  return (
-                    <div key={index} className="mb-8 p-6 border rounded-lg">
-                      <h4 className="text-xl font-semibold mb-4">{question.title}</h4>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div className="p-4 bg-gray-50 rounded">
-                          <div className="text-sm text-gray-600">Tests Passed</div>
-                          <div className="text-xl font-bold">
-                            {submission.testsPassed}/{submission.totalTests}
-                          </div>
-                        </div>
-                        
-                        {/* Optimization Status */}
-                        <div className={`p-4 rounded ${
-                          submission.optimization?.optimal 
-                            ? "bg-green-50" 
-                            : "bg-yellow-50"
-                        }`}>
-                          <div className="text-sm text-gray-600">Solution Efficiency</div>
-                          <div className="text-sm mt-1">
-                            {submission.optimization?.optimal 
-                              ? "✓ Optimal Solution" 
-                              : `⚠ ${submission.optimization?.reason}`}
-                          </div>
-                        </div>
-                      </div>
+                <h3 className="text-2xl font-semibold mb-6">
+                  Code Review & Optimization
+                </h3>
 
-                      {/* Show optimal solution if the submitted solution isn't optimal */}
-                      {(!submission.optimization?.optimal && question.optimalSolution) && (
-                        <OptimalSolutionDisplay
-                          question={question}
-                          submittedCode={submission.code}
-                          language={submission.language}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                {results?.coding?.answers &&
+                  Object.entries(results.coding.answers).map(
+                    ([index, submission]) => {
+                      const question = results.questions[index];
+                      return (
+                        <div key={index} className="mb-8 p-6 border rounded-lg">
+                          <h4 className="text-xl font-semibold mb-4">
+                            {question.title}
+                          </h4>
+
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="p-4 bg-gray-50 rounded">
+                              <div className="text-sm text-gray-600">
+                                Tests Passed
+                              </div>
+                              <div className="text-xl font-bold">
+                                {submission.testsPassed}/{submission.totalTests}
+                              </div>
+                            </div>
+
+                            {/* Optimization Status */}
+                            <div
+                              className={`p-4 rounded ${
+                                submission.optimization?.optimal
+                                  ? "bg-green-50"
+                                  : "bg-yellow-50"
+                              }`}
+                            >
+                              <div className="text-sm text-gray-600">
+                                Solution Efficiency
+                              </div>
+                              <div className="text-sm mt-1">
+                                {submission.optimization?.optimal
+                                  ? "✓ Optimal Solution"
+                                  : `⚠ ${submission.optimization?.reason}`}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Show optimal solution if the submitted solution isn't optimal */}
+                          {!submission.optimization?.optimal &&
+                            question.optimalSolution && (
+                              <OptimalSolutionDisplay
+                                question={question}
+                                submittedCode={submission.code}
+                                language={submission.language}
+                              />
+                            )}
+                        </div>
+                      );
+                    }
+                  )}
               </div>
             </div>
 
@@ -266,6 +314,12 @@ const Results = () => {
               >
                 Print Results
               </button>
+              <div>
+                <h5>Feeling confident? Take an interview!</h5>
+                <NavLink to="http://localhost:3001/resupload">
+                  <button>Interview</button>
+                </NavLink>
+              </div>
             </div>
           </div>
         </div>
