@@ -488,7 +488,7 @@ const Exam = () => {
             setCheckStatus("⚠️ Only one person should be visible");
           } else if (data.person_count === 1 && !data.cellphone_detected) {
             if (!nKeyRef.current) {
-              setCheckStatus("Press 'N' to start the exam...");
+              setCheckStatus("Authorizing...");
             } else {
               setCheckStatus(
                 "✅ Environment check passed! Starting exam in 3 seconds..."
