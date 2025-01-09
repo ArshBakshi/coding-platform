@@ -59,16 +59,16 @@ const Landing = () => {
   const stats = [
     {
       number: "98%",
-      label: "Success Rate",
+      label: "Positive Feedback",
       icon: <CheckCircle className="w-6 h-6" />,
     },
     {
-      number: "75K+",
+      number: "25+",
       label: "Interviews",
       icon: <Users className="w-6 h-6" />,
     },
     {
-      number: "250+",
+      number: "All",
       label: "Companies",
       icon: <Building className="w-6 h-6" />,
     },
@@ -106,13 +106,12 @@ const Landing = () => {
                   className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] text-sm font-mono px-4 py-2 rounded-full border border-[var(--border-stroke)]"
                   whileHover={{ scale: 1.05 }}
                 >
-                  AI-POWERED INTERVIEW MASTERY
+                  AI-POWERED PLACEMENT PRACTICE
                 </motion.span>
               </div>
               <h1 className="text-6xl md:text-7xl font-bold mb-8 text-[var(--accent-blue-headers)] space-mono-bold">
-                Master The
+                _Get-Me-Placed_
                 <br />
-                Interview Game
               </h1>
               <p className="text-xl md:text-2xl text-[var(--gray-300)] mb-12 max-w-3xl mx-auto space-mono-regular">
                 One Platform. Endless Possibilities. Be Job-Ready Anytime,
@@ -124,14 +123,14 @@ const Landing = () => {
                   whileTap={{ scale: 0.95 }}
                   className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
                 >
-                  Start Free Trial _
+                  Practice DSA_
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-[var(--Neutral-10)] text-[var(--gray-300)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
                 >
-                  Watch Demo
+                  _Give interview
                 </motion.button>
               </div>
             </motion.div>
@@ -230,7 +229,7 @@ const Landing = () => {
                 Ready To Level Up?_
               </h2>
               <p className="text-[var(--gray-300)] text-xl mb-8 space-mono-regular">
-                Join thousands of successful candidates who have mastered their
+                Join successful candidates who have mastered their
                 interview skills
               </p>
               <motion.button
@@ -238,10 +237,10 @@ const Landing = () => {
                 whileTap={{ scale: 0.95 }}
                 className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
               >
-                Start Free Trial _
+                Give Free Test _
               </motion.button>
               <p className="mt-4 text-[var(--gray-500)] space-mono-regular">
-                No credit card required • 14-day free trial
+                No credit card required • Totally Free (for now atleast)
               </p>
             </motion.div>
           </div>
