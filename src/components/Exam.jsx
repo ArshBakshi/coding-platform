@@ -1,40 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-const MOCK_QUESTIONS = [
-  {
-    question: "What is the capital of France?",
-    options: ["London", "Berlin", "Paris", "Madrid"],
-    correct_answer: "Paris",
-  },
-  {
-    question: "Which planet is known as the Red Planet?",
-    options: ["Venus", "Mars", "Jupiter", "Saturn"],
-    correct_answer: "Mars",
-  },
-  {
-    question: "What is 2 + 2?",
-    options: ["3", "4", "5", "6"],
-    correct_answer: "4",
-  },
-  {
-    question: "Who wrote 'Romeo and Juliet'?",
-    options: [
-      "Charles Dickens",
-      "William Shakespeare",
-      "Jane Austen",
-      "Mark Twain",
-    ],
-    correct_answer: "William Shakespeare",
-  },
-  {
-    question: "What is the chemical symbol for gold?",
-    options: ["Ag", "Fe", "Au", "Cu"],
-    correct_answer: "Au",
-  },
-];
-
-
 const CODING_QUESTIONS = [
   {
     id: 1,
@@ -95,6 +61,7 @@ const CODING_QUESTIONS = [
     },
   },
 ];
+
 const executeCode = async (code, language, testCases) => {
   const runTestCase = (testCase, code, language) => {
     try {
@@ -121,7 +88,6 @@ const executeCode = async (code, language, testCases) => {
           result = fn(testCase.input);
         }
 
-        // Deep comparison for arrays and primitives
         const passed = Array.isArray(result)
           ? JSON.stringify(result.sort()) ===
             JSON.stringify(testCase.expected.sort())
@@ -133,7 +99,6 @@ const executeCode = async (code, language, testCases) => {
           error: null,
         };
       } else if (language === "python" || language === "java") {
-        // Mock execution for Python/Java - you'll need backend service
         return {
           passed: false,
           actual: null,
@@ -193,6 +158,7 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
       totalTests: currentQuestion.testCases.length,
     });
   };
+
   return (
     <div className="space-y-6">
       <div className="bg-gray-50 p-4 rounded-lg">
@@ -286,12 +252,12 @@ const CodingSection = ({ currentQuestion, onSubmit }) => {
     </div>
   );
 };
+
 const Exam = () => {
   const navigate = useNavigate();
-  const [questions] = useState(MOCK_QUESTIONS);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(600);
   const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isExamOver, setIsExamOver] = useState(false);
   const [isNPressed, setIsNPressed] = useState(false);
   const nKeyRef = useRef(false);
@@ -319,10 +285,7 @@ const Exam = () => {
   const [currentCodingIndex, setCurrentCodingIndex] = useState(0);
   const [codingAnswers, setCodingAnswers] = useState({});
   const [data, setData] = useState([]);
-  const [examResults, setExamResults] = useState({
-    mcq: {},
-    coding: {},
-  });
+
   useEffect(() => {
     const fetchData = async () => {
       const api_key = process.env.REACT_APP_Api_KEY;
@@ -408,6 +371,7 @@ const Exam = () => {
       .then((response) => response.json())
       .catch((error) => console.error("Error stopping proctoring:", error));
   };
+
   const monitorTabSwitch = () => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && !isInitialCheck) {
@@ -506,12 +470,9 @@ const Exam = () => {
       setWarnings((prev) => ({ ...prev, cellphone: 0 }));
     }
   };
+
   const checkEnvironment = () => {
-    console.log("Starting environment check");
-
     const checkInterval = setInterval(() => {
-      console.log("Checking environment...", { isNPressed: nKeyRef.current });
-
       fetch("http://127.0.0.1:5000/status")
         .then((response) => response.json())
         .then((data) => {
@@ -574,14 +535,6 @@ const Exam = () => {
       [currentQuestionIndex]: answer,
     };
     setSelectedAnswers(newAnswers);
-    setExamResults((prev) => ({
-      ...prev,
-      mcq: newAnswers,
-    }));
-  };
-
-  const handleSectionSwitch = (section) => {
-    setExamSection(section);
   };
 
   const handleCodingSubmit = (codingResult) => {
@@ -590,22 +543,34 @@ const Exam = () => {
       [currentCodingIndex]: codingResult,
     };
     setCodingAnswers(newCodingAnswers);
-    setExamResults((prev) => ({
-      ...prev,
-      coding: newCodingAnswers,
-    }));
   };
+
   const handleExamEnd = (reason) => {
     setIsExamOver(true);
     stopProctoring();
 
+    // Calculate MCQ score based on API data
+    const mcqScore = Object.entries(selectedAnswers).reduce(
+      (acc, [idx, answer]) => {
+        const correctAnswers = data[idx].correct_answers;
+        // Find which answer is marked as correct in the API response
+        const correctAnswer = Object.entries(correctAnswers).find(
+          ([key, value]) => value === "true"
+        );
+        const correctKey = correctAnswer
+          ? correctAnswer[0].replace("_correct", "")
+          : null;
+        const isCorrect = data[idx].answers[correctKey] === answer;
+        return acc + (isCorrect ? 1 : 0);
+      },
+      0
+    );
+
     const finalResults = {
       mcq: {
         answers: selectedAnswers,
-        score: Object.entries(selectedAnswers).reduce((acc, [idx, answer]) => {
-          return acc + (answer === MOCK_QUESTIONS[idx].correct_answer ? 1 : 0);
-        }, 0),
-        total: MOCK_QUESTIONS.length,
+        score: mcqScore,
+        total: data.length,
       },
       coding: {
         answers: codingAnswers,
@@ -618,9 +583,12 @@ const Exam = () => {
       },
     };
 
+    // Store results in sessionStorage
     sessionStorage.setItem("examResults", JSON.stringify(finalResults));
     sessionStorage.setItem("examEndReason", reason);
-    navigate("/response");
+
+    // Navigate to results page
+    navigate("/result");
   };
 
   if (isInitialCheck) {
@@ -675,6 +643,7 @@ const Exam = () => {
       </div>
     );
   }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
@@ -688,7 +657,7 @@ const Exam = () => {
 
         <div className="flex space-x-4 mb-6">
           <button
-            onClick={() => handleSectionSwitch("mcq")}
+            onClick={() => setExamSection("mcq")}
             className={`px-4 py-2 rounded-lg ${
               examSection === "mcq"
                 ? "bg-blue-500 text-white"
@@ -698,7 +667,7 @@ const Exam = () => {
             Multiple Choice
           </button>
           <button
-            onClick={() => handleSectionSwitch("coding")}
+            onClick={() => setExamSection("coding")}
             className={`px-4 py-2 rounded-lg ${
               examSection === "coding"
                 ? "bg-blue-500 text-white"
@@ -727,26 +696,27 @@ const Exam = () => {
                 {data[currentQuestionIndex]?.question}
               </p>
               <div className="space-y-3">
-                {Object.entries(data[currentQuestionIndex].answers).filter(([key, value]) => value !== null).map(
-                  ([key,value], index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleAnswerSelect(value)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors
-                      ${
-                        selectedAnswers[currentQuestionIndex] === value
-                          ? "bg-blue-100 border-blue-500"
-                          : "hover:bg-gray-50"
-                      }`}
-                    >
-                      {value}
-                    </div>
-                  )
-                )}
+                {data[currentQuestionIndex]?.answers &&
+                  Object.entries(data[currentQuestionIndex].answers)
+                    .filter(([key, value]) => value !== null)
+                    .map(([key, value], index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleAnswerSelect(value)}
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors
+                            ${
+                              selectedAnswers[currentQuestionIndex] === value
+                                ? "bg-blue-100 border-blue-500"
+                                : "hover:bg-gray-50"
+                            }`}
+                      >
+                        {value}
+                      </div>
+                    ))}
               </div>
             </div>
 
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between">
               <button
                 onClick={() =>
                   setCurrentQuestionIndex((prev) => Math.max(0, prev - 1))
@@ -759,10 +729,10 @@ const Exam = () => {
               <button
                 onClick={() =>
                   setCurrentQuestionIndex((prev) =>
-                    Math.min(questions.length - 1, prev + 1)
+                    Math.min(data.length - 1, prev + 1)
                   )
                 }
-                disabled={currentQuestionIndex === questions.length - 1}
+                disabled={currentQuestionIndex === data.length - 1}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
               >
                 Next

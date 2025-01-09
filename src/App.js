@@ -10,6 +10,7 @@ import Exam from "./components/Exam";
 import { AptitudeQuiz } from "./pages/AptitudeQuiz";
 import { AptitudeTopics } from "./pages/AptitudeTopics";
 import Response from "./components/Response";
+import Results from "./components/Results";
 
 function App() {
   const router = createBrowserRouter([
@@ -51,6 +52,10 @@ function App() {
     {
       path: "/response",
       element: <Response />,
+    },
+    {
+      path: "/result",
+      element: <Results />,
     },
   ]);
   return <RouterProvider router={router} />;
