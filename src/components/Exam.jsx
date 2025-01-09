@@ -603,9 +603,17 @@ const Exam = () => {
       mcq: {
         answers: selectedAnswers,
         score: Object.entries(selectedAnswers).reduce((acc, [idx, answer]) => {
-          return acc + (answer === MOCK_QUESTIONS[idx].correct_answer ? 1 : 0);
+          const correctAnswerKey = Object.entries(data[idx].correct_answers).find(
+            ([key, value]) => value === "true"
+          )?.[0];
+    
+          const correctAnswer = correctAnswerKey
+            ? data[idx].answers[correctAnswerKey.replace("_correct", "")]
+            : null;
+    
+          return acc + (answer === correctAnswer ? 1 : 0);
         }, 0),
-        total: MOCK_QUESTIONS.length,
+        total: data.length,
       },
       coding: {
         answers: codingAnswers,
