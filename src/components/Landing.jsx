@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   Brain,
   Target,
@@ -58,7 +59,7 @@ const Landing = () => {
 
   const stats = [
     {
-      number: "98%",
+      number: "100%",
       label: "Positive Feedback",
       icon: <CheckCircle className="w-6 h-6" />,
     },
@@ -86,7 +87,7 @@ const Landing = () => {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--Neutral-10)_1px,transparent_1px),linear-gradient(to_bottom,var(--Neutral-10)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
         <div className="absolute inset-0">
           <div className="absolute -top-2 -left-2 w-[calc(100%+16px)] h-[calc(100%+16px)] bg-[radial-gradient(circle_400px_at_0%_0%,var(--Blue-800)_10%,transparent_70%)] animate-[move-background_15s_linear_infinite]" />
-          <div className="absolute -top-2 -left-2 w-[calc(100%+16px)] h-[calc(100%+16px)] bg-[radial-gradient(circle_400px_at_100%_0%,var(--Green-700)_10%,transparent_70%)] animate-[move-background_15s_linear_infinite]" />
+          <div className="absolute -top-2 -left-2 w-[calc(100%+16px)] h-[calc(100%+16px)] bg-[radial-gradient(circle_400px_at_0%_0%,var(--Green-700)_10%,transparent_70%)] animate-[move-background_15s_linear_infinite]" />
         </div>
       </div>
 
@@ -118,20 +119,24 @@ const Landing = () => {
                 Anywhere.
               </p>
               <div className="flex gap-6 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
-                >
-                  Practice DSA_
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-[var(--Neutral-10)] text-[var(--gray-300)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
-                >
-                  _Give interview
-                </motion.button>
+                <Link to="http://localhost:3001/dsa">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                  >
+                    Practice DSA_
+                  </motion.button>
+                </Link>
+                <Link to="http://localhost:3001/resupload">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[var(--Neutral-10)] text-[var(--gray-300)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                  >
+                    _Give interview
+                  </motion.button>
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -229,16 +234,18 @@ const Landing = () => {
                 Ready To Level Up?_
               </h2>
               <p className="text-[var(--gray-300)] text-xl mb-8 space-mono-regular">
-                Join successful candidates who have mastered their
-                interview skills
+                Join successful candidates who have mastered their interview
+                skills
               </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
-              >
-                Give Free Test _
-              </motion.button>
+              <Link to="/test">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                >
+                  Give Free Test _
+                </motion.button>
+              </Link>
               <p className="mt-4 text-[var(--gray-500)] space-mono-regular">
                 No credit card required • Totally Free (for now atleast)
               </p>
