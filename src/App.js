@@ -1,69 +1,27 @@
-import React from "react";
-import MainPage from "./pages/MainPage";
-import "./App.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { getApiData } from "./api/getApiData";
-import { AppLayout } from "./layout/AppLayout";
-import { QuizResults } from "./components/QuizResults";
-import { Test } from "./pages/Test";
-import Exam from "./components/Exam";
-import { AptitudeQuiz } from "./pages/AptitudeQuiz";
-import { AptitudeTopics } from "./pages/AptitudeTopics";
-import Response from "./components/Response";
-import Results from "./components/Results";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "./components/Landing";
+import { Test } from "./pages/Test";
+import Login from "./components/Login";
+import Begin from "./components/Begin";
+import Exam from "./components/Exam";
+import Result from "./components/Results"
 
 function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <AppLayout />,
-      children: [
-        {
-          path: "/",
-          element: <Landing />,
-        },
-        {
-          path: "/aptitude",
-          element: <AptitudeTopics />,
-        },
-        {
-          path: "/aptitude/quiz",
-          element: <AptitudeQuiz />,
-          loader: ({ request }) => {
-            const url = new URL(request.url);
-            const category = url.searchParams.get("category");
-            return getApiData(category);
-          },
-        },
-        {
-          path: "/quiz-results",
-          element: <QuizResults />,
-        },
-        {
-          path: "/coding",
-          element: <MainPage />,
-        },
-      ],
-    },
-    {
-      path: "/test",
-      element: <Test />,
-    },
-    {
-      path: "/exam",
-      element: <Exam />,
-    },
-    {
-      path: "/response",
-      element: <Response />,
-    },
-    {
-      path: "/result",
-      element: <Results />,
-    },
-  ]);
-  return <RouterProvider router={router} />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Test />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/result" element={<Result />} />
+        
+        {/* Parent Route */}
+        <Route path="/test" element={<Test />}>
+          <Route index element={<Begin />} /> {/* Default child route */}
+          <Route path="exam" element={<Exam />} /> {/* Nested route */}
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

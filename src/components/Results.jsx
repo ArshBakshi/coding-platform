@@ -316,22 +316,6 @@ const Results = () => {
                     Print Results
                   </button>
                 </div>
-
-                {/* Interview Section */}
-                <div className="text-center p-8 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl shadow-sm">
-                  <h5 className="text-xl font-semibold text-gray-800 mb-3">
-                    Ready to Take the Next Step?
-                  </h5>
-                  <p className="text-gray-600 mb-6">
-                    Feeling confident? Put your skills to the test in a mock interview!
-                  </p>
-                  <NavLink 
-                    to="http://localhost:3001/resupload"
-                    className="inline-block px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                  >
-                    Start Mock Interview
-                  </NavLink>
-                </div>
               </div>
             </div>
           </div>

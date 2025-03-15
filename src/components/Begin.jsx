@@ -5,7 +5,7 @@ const Begin = () => {
   const navigate = useNavigate();
 
   const handleStartTest = () => {
-    navigate("/exam");
+    navigate("/test/exam");
   };
 
   return (
