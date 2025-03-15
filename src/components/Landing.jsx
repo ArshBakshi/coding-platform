@@ -1,55 +1,24 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Camera, Shield, Eye, CheckCircle, Check } from "lucide-react";
-import bg from '../bg.gif';
-
-// Add global styles for the scrollbar
-const globalStyles = `
-  /* For Webkit browsers (Chrome, Safari) */
-  ::-webkit-scrollbar {
-    width: 8px;
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    transition: background 0.2s ease;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  /* For Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-  }
-`;
-
-const Button = ({ children, variant = "default", className = "", onClick, ...props }) => {
-  const baseStyles = "px-4 py-2 rounded-md font-medium transition-all duration-200";
-  const variants = {
-    default: "bg-blue-600 hover:bg-blue-700 text-white",
-    ghost: "bg-transparent hover:bg-white/10 text-white",
-    pricing: "bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 text-lg",
-  };
-
-  return (
-    <button 
-      className={`${baseStyles} ${variants[variant]} ${className}`}
-      onClick={onClick}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+import React from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import {
+  Brain,
+  Target,
+  Code2,
+  FileText,
+  Monitor,
+  Sparkles,
+  Users,
+  Award,
+  TrendingUp,
+  CheckCircle,
+  BarChart,
+  Building,
+  Star,
+  Shield,
+  Terminal,
+  Cpu,
+} from "lucide-react";
 
 const Landing= () => {
   const [scrolled, setScrolled] = useState(false);
@@ -134,8 +103,9 @@ const Landing= () => {
 
   const faqItems = [
     {
-      question: "How does ProcX ensure exam integrity?",
-      answer: "ProcX uses advanced AI-powered monitoring systems that detect suspicious behavior, track eye movements, and scan the environment for unauthorized materials. Our system maintains continuous surveillance throughout the examination process."
+      number: "100%",
+      label: "Positive Feedback",
+      icon: <CheckCircle className="w-6 h-6" />,
     },
     {
       question: "What technical requirements are needed to use ProcX?",
@@ -156,73 +126,66 @@ const Landing= () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
-        {/* Video Background */}
-        <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-black/60 z-10" />
-        <img src={bg} className="w-full h-full object-cover opacity-55" alt="background" />
+    <div className="min-h-screen font-mono bg-[var(--Neutral-5)] text-[var(--gray-200)]">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--Neutral-10)_1px,transparent_1px),linear-gradient(to_bottom,var(--Neutral-10)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+        <div className="absolute inset-0">
+          <div className="absolute -top-2 -left-2 w-[calc(100%+16px)] h-[calc(100%+16px)] bg-[radial-gradient(circle_400px_at_0%_0%,var(--Blue-800)_10%,transparent_70%)] animate-[move-background_15s_linear_infinite]" />
+          <div className="absolute -top-2 -left-2 w-[calc(100%+16px)] h-[calc(100%+16px)] bg-[radial-gradient(circle_400px_at_0%_0%,var(--Green-700)_10%,transparent_70%)] animate-[move-background_15s_linear_infinite]" />
+        </div>
       </div>
 
-      {/* [Previous navbar remains the same but add FAQ button with scroll] */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-black/80 backdrop-blur-lg" : "bg-transparent"}`}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-            ProcX
-          </span>
-          <div className="flex gap-8">
-            <Button 
-              variant="ghost" 
-              className="text-white hover:text-blue-400" 
-              onClick={() => scrollToSection(featuresRef)}
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <div className="relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center"
             >
-              Features
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="text-white hover:text-blue-400" 
-              onClick={() => scrollToSection(aboutRef)}
-            >
-              About
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="text-white hover:text-blue-400"
-              onClick={() => scrollToSection(faqRef)}
-            >
-              FAQ
-            </Button>
-            <Button onClick={handleLoginClick}>
-              Login
-            </Button>
-            <Button onClick={handleLoginClick}>
-              Sign up
-            </Button>
+              <div className="mb-6">
+                <motion.span
+                  className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] text-sm font-mono px-4 py-2 rounded-full border border-[var(--border-stroke)]"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  AI-POWERED PLACEMENT PRACTICE
+                </motion.span>
+              </div>
+              <h1 className="text-6xl md:text-7xl font-bold mb-8 text-[var(--accent-blue-headers)] space-mono-bold">
+                _Get-Me-Placed_
+                <br />
+              </h1>
+              <p className="text-xl md:text-2xl text-[var(--gray-300)] mb-12 max-w-3xl mx-auto space-mono-regular">
+                One Platform. Endless Possibilities. Be Job-Ready Anytime,
+                Anywhere.
+              </p>
+              <div className="flex gap-6 justify-center">
+                <Link to="http://localhost:3001/dsa">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                  >
+                    Practice DSA_
+                  </motion.button>
+                </Link>
+                <Link to="http://localhost:3001/resupload">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-[var(--Neutral-10)] text-[var(--gray-300)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                  >
+                    _Give interview
+                  </motion.button>
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </nav>
-
-      {/* Hero Section - Updated with pricing button */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 text-center">
-          <h1 className="text-7xl font-bold mb-8 pb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent animate-fadeIn">
-            The Future of
-            <br />
-            Online Proctoring
-          </h1>
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Advanced AI-powered exam monitoring system that ensures academic integrity while providing a seamless experience.
-          </p>
-          <Button 
-            className="mb-8 btn-info btn"
-            onClick={() => scrollToSection(pricingRef)}
-          >
-          <p className=" text-lg">  Check out our prices!!</p>
-          </Button>
-          <p className="text-lg text-blue-400 mt-8">
-            Developed by letMeSoloThis
-          </p>
-        </div>
-      </div>
 
       {/* Features Grid */}
       <div ref={featuresRef} className="relative z-10 bg-black/80 backdrop-blur-lg py-32">
@@ -293,38 +256,35 @@ const Landing= () => {
         </div>
       </div>
 
-      <div ref={aboutRef} className="relative z-10 bg-gray-900 min-h-screen flex items-center py-32">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-5xl font-bold text-blue-400 mb-8">About ProcX</h2>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed">
-            ProcX is a revolutionary AI-driven proctoring solution designed to uphold the integrity of online examinations
-            in educational institutions and corporate training environments. Our platform integrates state-of-the-art
-            facial recognition, environment monitoring, and behavioral analysis to provide seamless, secure, and automated
-            exam invigilation. With a focus on delivering a streamlined user experience, ProcX aims to make remote exams
-            both fair and accessible.
-          </p>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            ProcX is built on cutting-edge technology, ensuring minimal interruptions
-            and maximum security. Whether you're a student or an administrator, ProcX is here to simplify and safeguard
-            the examination process, making academic honesty a priority.
-          </p>
-        </div>
-      </div>
-
-      {/* FAQ Section */}
-      <div ref={faqRef} className="relative z-10 bg-gray-900/80 py-32">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-5xl font-bold text-center text-blue-400 mb-16">Frequently Asked Questions</h2>
-          <div className="space-y-8">
-            {faqItems.map((item, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 hover:bg-gray-800/70 transition-all duration-300"
-              >
-                <h3 className="text-xl font-semibold text-white mb-4">{item.question}</h3>
-                <p className="text-gray-300 leading-relaxed">{item.answer}</p>
-              </div>
-            ))}
+        {/* CTA Section */}
+        <div className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center max-w-3xl mx-auto"
+            >
+              <h2 className="text-4xl font-bold mb-6 text-[var(--accent-blue-headers)] space-mono-bold">
+                Ready To Level Up?_
+              </h2>
+              <p className="text-[var(--gray-300)] text-xl mb-8 space-mono-regular">
+                Join successful candidates who have mastered their interview
+                skills
+              </p>
+              <Link to="/test">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-[var(--accent-blue-active-bg)] text-[var(--accent-blue)] px-8 py-4 rounded-2xl font-mono text-lg border border-[var(--border-stroke)] hover:bg-[var(--Neutral-15)] transition-all duration-300"
+                >
+                  Give Free Test _
+                </motion.button>
+              </Link>
+              <p className="mt-4 text-[var(--gray-500)] space-mono-regular">
+                No credit card required • Totally Free (for now atleast)
+              </p>
+            </motion.div>
           </div>
         </div>
       </div>

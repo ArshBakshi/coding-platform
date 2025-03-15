@@ -27,6 +27,7 @@ const Begin = () => {
             in disqualification.
           </li>
           <li>Remain in a quiet, isolated environment to maintain focus.</li>
+          <li>Audio and video will be monitored</li>
           <li>The test will begin when you click "Start Test."</li>
         </ul>
         <button

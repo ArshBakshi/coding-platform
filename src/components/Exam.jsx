@@ -423,8 +423,8 @@ const Exam = () => {
         setIsNPressed(true);
       } else if (event.key === "k" || (event.key === "K" && !isInitialCheck)) {
         stopProctoring();
-        handleExamEnd("Test terminated: Unauthorized person detected");
-        addAlert("🛑 Exam terminated due to unauthorized person", "error");
+        handleExamEnd("Test terminated: Due to malpractice");
+        addAlert("🛑 Exam terminated due to malpractice", "error");
       }
     };
 

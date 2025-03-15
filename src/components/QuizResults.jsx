@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export const QuizResults = () => {
@@ -6,6 +6,10 @@ export const QuizResults = () => {
   const navigate = useNavigate();
   const { results, score, totalQuestions, answeredQuestions } =
     location.state || {};
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   if (!results) {
     navigate("/aptitude");
